@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+# Data Access (ORM)
+SQLAlchemy
+# MySQL Driver
+PyMySQL
+# For external HTTP calls
+requests
