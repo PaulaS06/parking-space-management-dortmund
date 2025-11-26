@@ -24,15 +24,30 @@
             </div>
         </div>
         <div class="search">
-            <button class="filter-button">
+            <button class="filter-button" onclick="openModal()">
                 <i class="fas fa-sliders-h"></i>
             </button>
             <input id="search" type="text" placeholder="Search Parking Location">
             <ul id="suggestions"></ul>
-            <button type="submit" class="submit-btn">Search Parking</button>
+            <input type="hidden" id="evChargingInput" name="ev_charging" value="false">
+            <button type="submit" class="submit-btn" onclick="searchParking()">Search Parking</button>
+            <ul id="parkingList"></ul>
         </div>
-
     </div>
+        <!-- Modal -->
+    <div id="filterModal" class="modal">
+        <div class="modal-content">
+            <h3>Filter</h3>
+            <label>
+                <input type="checkbox" id="evChargingCheckbox">
+                EV-Charging vorhanden
+            </label>
+            <br><br>
+            <button onclick="applyFilter()">Übernehmen</button>
+            <button onclick="closeModal()">Schließen</button>
+        </div>
+    </div>
+    <script src="/static/js/result_list.js"></script>
     <script src="/static/js/search_suggestions.js"></script>
 </body>
 </html>
