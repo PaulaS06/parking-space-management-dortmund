@@ -152,10 +152,22 @@ input[type="text"] {
 }
 
 .modal-content {
-    background: white;
+    background-color: #f3f3f3;
     padding: 20px;
     width: 300px;
-    margin: 15% auto;
+    margin: 50% auto;
     border-radius: 10px;
 }
 
+.modal-btn {
+    background-color: #e4c810;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    border:none;
+    font-size: 16px;
+}
+
+.modal-btn:active {
+  background-color: #b9a30d;
+}

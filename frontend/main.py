@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session
+from flask_session import Session
+from datetime import timedelta
 import requests
 
 GEOAPIFY_API_KEY = "e2a0ea3f5d5e4efd819ad7345c90e18b"
@@ -9,13 +11,18 @@ PARKHOUSES = [
     {"name": "Parkhaus C", "lat": 51.516, "lon": 7.462, "ev_charging": True},
 ]
 
-ev_filter = False
-
 app = Flask(__name__)
+app.config["SESSION_PERMANENT"] = False     # Sessions expire when the browser is closed
+app.config["SESSION_TYPE"] = "filesystem"
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=5)
+
+# Initialize Flask-Session
+Session(app)
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    ev_filter = session.get('ev_filter', False)
+    return render_template('index.html', ev_filter=ev_filter)
 
 @app.route('/nearby')
 def nearby():
@@ -43,8 +50,8 @@ def autocomplete():
 
 @app.route("/api/filter")
 def api_filter():
-    global ev_filter
-    ev_filter = request.args.get("ev_charging") == "true"
+    session['ev_filter'] = request.args.get("ev_charging") == "true"
+    ev_filter = session.get('ev_filter')
 
     results = PARKHOUSES
     if ev_filter:
@@ -55,6 +62,7 @@ def api_filter():
 @app.route("/api/search")
 def api_search():
     results = PARKHOUSES
+    ev_filter = session.get('ev_filter')
     if ev_filter:
         results = [p for p in results if p["ev_charging"]]
     return results
