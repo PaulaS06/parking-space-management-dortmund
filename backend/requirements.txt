@@ -1,8 +1,2 @@
-fastapi
-uvicorn[standard]
-# Data Access (ORM)
-SQLAlchemy
-# MySQL Driver
-PyMySQL
-# For external HTTP calls
-requests
+flask
+psycopg2-binary   # For Postgres database connection
