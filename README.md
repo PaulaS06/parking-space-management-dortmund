@@ -13,7 +13,7 @@ This project utilizes a microservices architecture containerized with Docker.
 ---
 
 ## 2. Prerequisites
-Ensure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installled
+Ensure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed
 
 ---
 
@@ -68,11 +68,11 @@ docker logs -f <container_name_or_id>
 
 ### Notes
 
-You should install this extention for VS Code it makes managing containers easier and you can see which are running. 
+- You should install this extension for VS Code it makes managing containers easier and you can see which are running. 
 
-**[Docker for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)**
+    **[Docker for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)**
 
-From time to time you can run the following to command to clean disk space
-```
-docker system prune -a
-```
+- From time to time you can run the following to command to clean disk space
+    ```
+    docker system prune -a
+    ```
