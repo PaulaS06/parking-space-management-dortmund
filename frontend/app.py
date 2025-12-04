@@ -13,7 +13,7 @@ def home():
     except Exception as e:
         message = f"Error: Backend is offline. ({e})"
 
-    return f"<h1>Frontend UI</h1><p>Message from Backend: {message}</p>"
+    return render_template('window1.html')
 
 
 if __name__ == "__main__":
