@@ -1,22 +1,22 @@
 services:
-  # 1. The Database
+  # 1. The Database (SQLite volume container)
   db:
-    image: sqlite:latest
-    restart: always
+    image: alpine:latest
+    command: tail -f /dev/null
     volumes:
       - db_data:/data
-    ports:
-      - "5432:5432"
 
   # 2. The Backend (API)
   backend:
     build: ./backend
     ports:
       - "8000:8000"
+    volumes:
+      - db_data:/data
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://user:password@db:5432/app_db
+      DATABASE_URL: sqlite:///data/app.db
 
   # 3. The Frontend (UI)
   frontend:
