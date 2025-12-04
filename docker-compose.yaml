@@ -1,18 +1,14 @@
 services:
-  # 1. The Database (Use a stock image, no Dockerfile needed usually)
+  # 1. The Database
   db:
-    image: postgres:15-alpine
+    image: sqlite:latest
     restart: always
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: app_db
+    volumes:
+      - db_data:/data
     ports:
       - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
 
-  # 2. The Backend (Your API)
+  # 2. The Backend (API)
   backend:
     build: ./backend
     ports:
@@ -28,7 +24,6 @@ services:
       ports:
         - "3000:3000"
       environment:
-        # This allows you to change the target without rewriting code
         - BACKEND_URL=http://backend:8000
 
 volumes:
