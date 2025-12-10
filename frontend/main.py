@@ -6,9 +6,9 @@ import requests
 GEOAPIFY_API_KEY = "e2a0ea3f5d5e4efd819ad7345c90e18b"
 
 PARKHOUSES = [
-    {"name": "Parkhaus A", "lat": 51.513, "lon": 7.465, "ev_charging": True},
-    {"name": "Parkhaus B", "lat": 51.515, "lon": 7.468, "ev_charging": False},
-    {"name": "Parkhaus C", "lat": 51.516, "lon": 7.462, "ev_charging": True},
+    {"name": "Parkhaus A", "fullAddress":"fullAddressA", "lat": 51.513, "lon": 7.465, "capacity": 15, "priceTotal":15, "ev_charging": True, "walkingTimeMinutes":5, "walkingDistanceKm":0.3},
+    {"name": "Parkhaus B", "fullAddress":"fullAddressB", "lat": 51.515, "lon": 7.468, "capacity": 415, "priceTotal":14, "ev_charging": False, "walkingTimeMinutes":10, "walkingDistanceKm":0.65},
+    {"name": "Parkhaus C", "fullAddress":"fullAddressC", "lat": 51.516, "lon": 7.462, "capacity": 5, "priceTotal":16, "ev_charging": True, "walkingTimeMinutes":16, "walkingDistanceKm":1.1},
 ]
 
 app = Flask(__name__)

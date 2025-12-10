@@ -142,23 +142,6 @@ input[type="text"] {
   background: #f0f0f0;
 }
 
-.modal {
-    display: none;
-    position: fixed;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: #f3f3f3;
-    padding: 20px;
-    width: 300px;
-    margin: 10% auto;
-    border-radius: 10px;
-}
-
 .modal-btn {
     background-color: #e4c810;
     color: white;
@@ -170,4 +153,59 @@ input[type="text"] {
 
 .modal-btn:active {
   background-color: #b9a30d;
+}
+
+.result-list {
+    margin-top: 15px;
+    margin-right:10px;
+    margin-left:10px;
+    padding-left: 0px;
+}
+
+.result-card {
+    margin-bottom: 5px;
+}
+
+#parkingList .card {
+    border-radius: 20px;
+}
+.table-cell-left{
+    text-align: left;
+    width: 45%;
+}
+
+.table-cell-right{
+    text-align: center;
+    width: 40%;
+}
+
+.table-cell-middle{
+    text-align: left;
+    width: 15%;
+}
+
+.table{
+    margin-bottom:0px !important;
+}
+
+.dot {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.dot-green {
+    background-color: #28a745; /* grün */
+}
+
+.dot-red {
+    background-color: #dc3545; /* rot */
+}
+
+.parking-img{
+    width:30px;
+    height:30px;
+    margin-top:20px;
 }
