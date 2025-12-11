@@ -35,9 +35,6 @@ function updateParkingList(list) {
                         <h5 class="card-title">
                             ${item.name}
                         </h5>
-                        <p class="card-text">
-                            ${item.fullAddress}
-                        </p>
                     </td>
                     <td></td>
                     <td class="table-cell-right">
