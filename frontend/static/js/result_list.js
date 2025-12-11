@@ -49,7 +49,7 @@ function updateParkingList(list) {
                     <td class="table-cell-left">
                         <p class="card-text">
                             <span class="dot ${item.capacity > 5 ? 'dot-green' : 'dot-red'}"></span>
-                            ${item.capacity} Available
+                            ${item.capacity} available
                         </p>
                     </td>
                     <td class="table-cell-middle">
@@ -58,10 +58,9 @@ function updateParkingList(list) {
                         </p>
                     </td>
                     <td class="table-cell-right">
-                        <p class="card-text">${item.walkingTimeMinutes} minutes walk</p>
+                        <p class="card-text">${item.walkingTimeMinutes} min walk</p>
                     </td>
                 </tr>
-
             </tbody>
         </table>
         </div>

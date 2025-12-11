@@ -9,6 +9,8 @@ PARKHOUSES = [
     {"name": "Parkhaus A", "fullAddress":"fullAddressA", "lat": 51.513, "lon": 7.465, "capacity": 15, "priceTotal":15, "ev_charging": True, "walkingTimeMinutes":5, "walkingDistanceKm":0.3},
     {"name": "Parkhaus B", "fullAddress":"fullAddressB", "lat": 51.515, "lon": 7.468, "capacity": 415, "priceTotal":14, "ev_charging": False, "walkingTimeMinutes":10, "walkingDistanceKm":0.65},
     {"name": "Parkhaus C", "fullAddress":"fullAddressC", "lat": 51.516, "lon": 7.462, "capacity": 5, "priceTotal":16, "ev_charging": True, "walkingTimeMinutes":16, "walkingDistanceKm":1.1},
+    {"name": "Parkhaus C", "fullAddress":"fullAddressC", "lat": 51.516, "lon": 7.462, "capacity": 5, "priceTotal":16, "ev_charging": True, "walkingTimeMinutes":16, "walkingDistanceKm":1.1},
+    {"name": "Parkhaus C", "fullAddress":"fullAddressC", "lat": 51.516, "lon": 7.462, "capacity": 5, "priceTotal":16, "ev_charging": False, "walkingTimeMinutes":16, "walkingDistanceKm":1.1},
 ]
 
 app = Flask(__name__)

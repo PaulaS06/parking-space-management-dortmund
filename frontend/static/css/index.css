@@ -1,7 +1,9 @@
 /* Standard: Mobile First */
 .container {
     background-color: #f3f3f3;
-    padding: 30px;
+    padding-top: 20px;
+    padding-left: 5px;
+    padding-right:5px;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     width: 100vw;
@@ -32,7 +34,6 @@ body {
     .container {
         width: 600px;     /* Desktopbreite */
         height: 90vh;     /* Höhe automatisch */
-
     }
 }
 
@@ -59,6 +60,7 @@ input[type="text"] {
 }
 
 .submit-btn {
+    width:200px;
     padding: 10px 20px;
     background-color: #e4c810;
     color: white;
@@ -157,8 +159,9 @@ input[type="text"] {
 
 .result-list {
     margin-top: 15px;
-    margin-right:10px;
-    margin-left:10px;
+    margin-right:0px;
+    margin-left:0px;
+    margin-bottom:70px;
     padding-left: 0px;
 }
 
@@ -171,17 +174,17 @@ input[type="text"] {
 }
 .table-cell-left{
     text-align: left;
-    width: 45%;
+    width: 50%;
 }
 
 .table-cell-right{
     text-align: center;
-    width: 40%;
+    width: 45%;
 }
 
 .table-cell-middle{
     text-align: left;
-    width: 15%;
+    width: 5%;
 }
 
 .table{
