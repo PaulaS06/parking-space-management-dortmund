@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify, session
 from flask_session import Session
-from datetime import timedelta
+from DataTransferObjects import ParkingRequestDto, ParkingRecommendationDto
+from BackendRestClient import BackendRestClient
+from datetime import timedelta, datetime
 import requests
 
 GEOAPIFY_API_KEY = "e2a0ea3f5d5e4efd819ad7345c90e18b"
@@ -17,6 +19,8 @@ app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False     # Sessions expire when the browser is closed
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=5)
+
+backend_client = BackendRestClient(base_url="http://127.0.0.1:8000", username="admin", password="admin")
 
 # Initialize Flask-Session
 Session(app)
@@ -63,11 +67,27 @@ def api_filter():
 
 @app.route("/api/search")
 def api_search():
-    results = PARKHOUSES
+    #results = PARKHOUSES
     ev_filter = session.get('ev_filter')
-    if ev_filter:
-        results = [p for p in results if p["ev_charging"]]
-    return results
+
+    request_dto = ParkingRequestDto(
+        latitude=51.369214766072,
+        longitude=7.463498322569619,
+        start_time=datetime.now(),
+        end_time=datetime.now() + timedelta(hours=2),
+        limit=5
+    )
+
+    try:
+        results = backend_client.get_parking_recommendations(request_dto)
+
+        if ev_filter:
+            results = [r for r in results if r.evCharging]
+
+        return jsonify([r.__dict__ for r in results])
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
