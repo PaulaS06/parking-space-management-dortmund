@@ -28,7 +28,7 @@ function updateParkingList(list) {
 
         card.innerHTML = `
         <div class="card-body">
-        <table class="table table-borderless">
+        <table class="table table-borderless parking-table">
             <tbody>
                 <tr>
                     <td class="table-cell-left">
