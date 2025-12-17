@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="static/css/index.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="pb-5"> <!-- padding-bottom, damit die Navbar unten nicht überlappt -->
 
@@ -18,13 +19,25 @@
     </div>
 
     <nav class="fixed-bottom d-flex justify-content-center mb-3">
-        <div class="navbar navbar-dark bg-dark shadow rounded-pill px-4 py-2" style="max-width: 600px;">
-            <div class="d-flex justify-content-between" style="width: 200px;">
-                <a class="navbar-brand mx-auto" href="{{ url_for('home') }}">Search</a>
-                <a class="navbar-brand mx-auto" href="{{ url_for('nearby') }}">Nearby</a>
-            </div>
+    <div class="navbar navbar-dark bg-dark shadow rounded-pill px-4 py-2" style="max-width: 400px;">
+        <div class="d-flex justify-content-between" style="width: 150px;">
+
+            <a class="nav-link text-white text-center d-flex flex-column align-items-center"
+               href="{{ url_for('home') }}">
+                <i class="bi bi-search fs-5"></i>
+                <span class="small">Search</span>
+            </a>
+
+            <a class="nav-link text-white text-center d-flex flex-column align-items-center"
+               href="{{ url_for('nearby') }}">
+                <i class="bi bi-geo-alt fs-5"></i>
+                <span class="small">Nearby</span>
+            </a>
+
         </div>
-    </nav>
+    </div>
+</nav>
+
 
 
     <!-- Bootstrap JS -->
