@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="header">
+        <img src="static/images/logo.png" alt="logo" class="header-img">
+        <h1>ParkEasy</h1>
+        <div class="user-icon-circle">
+            <i class="fas fa-user"></i>
+        </div>
+    </div>
+    <div class="search">
+        <button class="filter-button" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <i class="fas fa-sliders-h"></i>
+        </button>
+        <input id="search" type="text" placeholder="Search Parking Location">
+        <ul id="suggestions"></ul>
+        <div class="row g-3 justify-content-center time-div">
+            <div class="col-md-6 time-input">
+                <label for="startTime" class="form-label">From</label>
+                <input type="time" class="form-control" id="startTime">
+            </div>
+            <div class="col-md-6 time-input">
+                <label for="endTime" class="form-label">To</label>
+                <input type="time" class="form-control" id="endTime">
+            </div>
+
+        </div>
+        <div class="row g-3 justify-content-center time-div">
+            <button type="submit" class="submit-btn" onclick="searchParking()">Search Parking</button>
+        </div>
+        <input type="hidden" id="evChargingInput" name="ev_charging" value="false">
+
+        <ul id="parkingList" class="result-list"></ul>
+    </div>
+    <!-- Bootstrap Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog custom-modal-position">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Filter</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <label>
+                        <input type="checkbox" id="evChargingCheckbox"
+                        {% if ev_filter %}checked{% endif %}>
+                        EV-Charging vorhanden
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="modal-btn" onclick="applyFilter()" data-bs-dismiss="modal">Übernehmen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+</html>
