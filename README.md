@@ -1,78 +1,153 @@
-# Project
+# ParkEasy - Parking Finder Application
 
-## 1. Project Overview
-This project utilizes a microservices architecture containerized with Docker.
+A web application to find the nearest available parking houses in Dortmund, Germany. The application provides walking distance and time estimates to help users find convenient parking.
 
-### Service Architecture
-| Service | Port 
-| :--- | :--- |
-| **Frontend** | `3000` |
-| **Backend** | `8000` |
-| **Database** | `5432` |
+## Project Structure
 
----
+```
+test-parking/
+├── backend/           # Flask REST API backend
+│   ├── app.py        # Main API with parking search endpoints
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/          # Flask frontend web UI
+│   ├── app.py        # Frontend server
+│   ├── templates/    # HTML templates
+│   ├── static/       # CSS, JS, and images
+│   ├── requirements.txt
+│   └── Dockerfile
+├── database/          # Database models and setup
+│   ├── database.py   # SQLAlchemy models
+│   └── create_db.py  # Database initialization
+├── data/             # JSON data storage
+├── docker-compose.yaml
+└── requirements.txt  # Root dependencies
+```
 
-## 2. Prerequisites
-Ensure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed
+## Features
 
----
+- **Real-time parking availability**: Fetches live data from Dortmund open data API
+- **Geocoding support**: Search by address or coordinates
+- **Walking distance calculation**: Uses Haversine formula and Geoapify routing API
+- **Opening hours validation**: Filters parking by availability during requested time
+- **Responsive web interface**: Clean UI with geolocation support
 
-## 3. Quick Start
+## Prerequisites
 
-### Starting the Application
-You can run the application in two modes:
+- Docker and Docker Compose
+- Python 3.9+ (for local development)
 
-**Option A: Standard Mode (Logs in Terminal)**
-Use this to see live logs from all containers in your current terminal window.
+## Quick Start with Docker
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/k-lk324/test-parking.git
+   cd test-parking
+   ```
+
+2. Start the application:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. Access the application:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000
+
+## Local Development
+
+### Backend Setup
+
 ```bash
-docker compose up --build
+cd backend
+pip install -r requirements.txt
+python app.py
 ```
 
-**Option B: Detached Mode (Background)**
-Use this if you want to keep using your current terminal window.
+The backend will run on `http://localhost:8000`
+
+### Frontend Setup
+
 ```bash
-docker compose up --build -d
+cd frontend
+pip install -r requirements.txt
+python app.py
 ```
 
-### Stopping the Application
-To stop the containers and remove the created networks:
+The frontend will run on `http://localhost:3000`
+
+## API Endpoints
+
+### GET /api/v1/parkinghouses/walking
+
+Find nearest parking houses within walking distance.
+
+**Parameters:**
+- `address` (string): Address to search from (optional if lat/lon provided)
+- `lat` (float): Latitude coordinate (optional if address provided)
+- `lon` (float): Longitude coordinate (optional if address provided)
+- `start_time` (ISO 8601 string): Start time for parking
+- `end_time` (ISO 8601 string): End time for parking
+- `limit` (integer): Number of results to return (default: 5)
+
+**Example:**
 ```bash
-docker compose down
+curl "http://localhost:8000/api/v1/parkinghouses/walking?address=Sonnenstrasse%2096,%20Dortmund&start_time=2024-01-15T10:00:00&end_time=2024-01-15T18:00:00&limit=5"
 ```
 
----
-
-## 4. Accessing the Application
-Once the containers are running, you can access the services via your browser:
-
-* **Frontend UI:** [http://localhost:3000](http://localhost:3000)
-* **Backend API:** [http://localhost:8000/api/data](http://localhost:8000/api/data)
-
----
-
-## 5. Development Workflow
-
-### Adding New Libraries
-
-If you add a new package to requirements.txt (frontend or backend), you must rebuild the container for it to take effect
-
-```
-docker compose up --build
+**Response:**
+```json
+[
+  {
+    "id": "parking_id",
+    "name": "Parking House Name",
+    "fullAddress": "Full Address",
+    "lat": 51.4883,
+    "lon": 7.4249,
+    "capacity": 500,
+    "freeSpots": 123,
+    "distance_haversine_km": 0.845,
+    "walkingDistanceInKm": 0.912,
+    "walkingTimeMinutes": 11.5
+  }
+]
 ```
 
-### View Logs
-If you're running in detached mode you can view the logs like this:
-```bash
-docker logs -f <container_name_or_id>
-```
+## Configuration
 
-### Notes
+### API Keys
 
-- You should install this extension for VS Code it makes managing containers easier and you can see which are running. 
+The backend uses Geoapify APIs for geocoding and routing. API keys are included in the code but should be moved to environment variables for production:
 
-    **[Docker for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)**
+- `GEOAPIFY_GEOCODE_KEY`
+- `GEOAPIFY_ROUTING_KEY`
 
-- From time to time you can run the following to command to clean disk space
-    ```
-    docker system prune -a
-    ```
+### Environment Variables
+
+Set these in docker-compose.yaml or your environment:
+
+- `DATABASE_URL`: Database connection string (default: sqlite:///data/app.db)
+- `BACKEND_URL`: Backend API URL for frontend (default: http://backend:8000)
+- `DEBUG`: Set to "true" to enable Flask debug mode (default: false, **NOT recommended for production**)
+
+**Security Note**: Debug mode is disabled by default for security. Only enable it in development environments.
+
+## Technologies Used
+
+- **Backend**: Flask, Flask-RESTful, Flask-SQLAlchemy
+- **Frontend**: Flask, HTML5, CSS3, JavaScript
+- **APIs**: Dortmund Open Data, Geoapify Geocoding & Routing
+- **Containerization**: Docker, Docker Compose
+- **Database**: SQLite (configurable)
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is open source and available under the MIT License.

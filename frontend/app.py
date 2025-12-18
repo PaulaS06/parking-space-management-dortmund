@@ -6,13 +6,6 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    try:
-        response = requests.get("http://backend:8000/api/data")
-        data = response.json()
-        message = data.get("message")
-    except Exception as e:
-        message = f"Error: Backend is offline. ({e})"
-
     return render_template('window1.html')
 
 

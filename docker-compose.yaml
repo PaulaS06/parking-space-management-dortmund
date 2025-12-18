@@ -17,6 +17,7 @@ services:
       - db
     environment:
       DATABASE_URL: sqlite:///data/app.db
+      # DEBUG: "true"  # Uncomment to enable debug mode (NOT recommended for production)
 
   # 3. The Frontend (UI)
   frontend:

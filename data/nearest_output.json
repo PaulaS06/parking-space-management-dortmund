@@ -1,0 +1,14 @@
+[
+    {
+        "id": "107394",
+        "name": "St.-Johannes-Hospital",
+        "fullAddress": "St. Johannes Hospital, Johannesstraße 9-17, 44137 Dortmund, Germany",
+        "lat": 51.510727,
+        "lon": 7.456745,
+        "capacity": 396,
+        "freeSpots": 231,
+        "distance_haversine_km": 0.494,
+        "walkingDistanceInKm": 0.996,
+        "walkingTimeMinutes": 15.08
+    }
+]

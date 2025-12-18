@@ -1,2 +1,6 @@
 flask
-psycopg2-binary   # For Postgres database connection
+requests
+# Note: flask-sqlalchemy and flask-restful are included for compatibility
+# with the database component (database/database.py) if integration is needed
+flask-sqlalchemy
+flask-restful

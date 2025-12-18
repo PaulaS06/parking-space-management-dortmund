@@ -16,3 +16,5 @@ COPY . .
 # (Optional) The command to run the app will be handled by docker-compose
 # but it's good practice to have a default:
 CMD ["python", "app.py"]
+
+EXPOSE 8000
