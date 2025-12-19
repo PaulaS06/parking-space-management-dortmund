@@ -10,10 +10,15 @@ function applyFilter() {
     let checkbox = document.getElementById("evChargingCheckbox");
     let ev = checkbox.checked ? "true" : "false";
 
-    // AJAX-Call
-    fetch(`/api/filter?ev_charging=${ev}`)
-        .then(response => response.json())
-        .then(data => updateParkingList(data));
+    fetch("/set_filter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          ev_charging: ev
+        })
+    });
 
     closeModal();
 }
@@ -69,6 +74,21 @@ function updateParkingList(list) {
 
 
 function searchParking() {
+    const startTime = document.getElementById("startTime").value; // "HH:MM"
+    const endTime = document.getElementById("endTime").value;
+
+    console.log(startTime, endTime);
+    fetch("/set_time", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          start_time: startTime,
+          end_time: endTime
+        })
+    });
+
     // AJAX-Call
     fetch(`/api/search`)
         .then(response => response.json())

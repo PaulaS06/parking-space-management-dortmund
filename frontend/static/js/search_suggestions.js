@@ -26,8 +26,19 @@ document.getElementById("search").addEventListener("input", function () {
             document.getElementById("search").value = item.properties.formatted;
             list.innerHTML = "";
 
-            console.log("Ausgewählt:", item.properties.formatted);
-            console.log("Koordinaten:", item.properties.lat, item.properties.lon);
+            const lat = item.properties.lat;
+            const lon = item.properties.lon;
+            console.log("Koordinaten:", lat, lon);
+            fetch("/set_location", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              lat: lat,
+              lon: lon
+            })
+          });
           };
 
           list.appendChild(li);

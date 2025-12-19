@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, session
 from flask_session import Session
 from DataTransferObjects import ParkingRequestDto, ParkingRecommendationDto
 from BackendRestClient import BackendRestClient
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 import requests
 
 GEOAPIFY_API_KEY = "e2a0ea3f5d5e4efd819ad7345c90e18b"
@@ -54,40 +54,73 @@ def autocomplete():
 
     return jsonify(data.get("features", []))
 
-@app.route("/api/filter")
-def api_filter():
-    session['ev_filter'] = request.args.get("ev_charging") == "true"
-    ev_filter = session.get('ev_filter')
+@app.route("/set_filter", methods=["POST"])
+def set_filter():
+    data = request.get_json()
+    session['ev_filter'] = data['ev_charging']
+    return {"status": "ok"}
 
-    results = PARKHOUSES
-    if ev_filter:
-        results = [p for p in results if p["ev_charging"]]
+@app.route("/set_location", methods=["POST"])
+def set_location():
+    data = request.get_json()
 
-    return results
+    session["lat"] = data["lat"]
+    session["lon"] = data["lon"]
+
+    return jsonify({"status": "ok"})
 
 @app.route("/api/search")
 def api_search():
     #results = PARKHOUSES
     ev_filter = session.get('ev_filter')
+    lat = session.get('lat')
+    lon = session.get('lon')
+    start_time = session.get('start_time')
+    end_time = session.get('end_time')
 
     request_dto = ParkingRequestDto(
-        latitude=51.369214766072,
-        longitude=7.463498322569619,
-        start_time=datetime.now(),
-        end_time=datetime.now() + timedelta(hours=2),
+        latitude=lat,
+        longitude=lon,
+        start_time=start_time,
+        end_time=end_time,
+        ev_charging=ev_filter,
         limit=5
     )
 
     try:
         results = backend_client.get_parking_recommendations(request_dto)
 
-        if ev_filter:
-            results = [r for r in results if r.evCharging]
-
         return jsonify([r.__dict__ for r in results])
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/set_time", methods=["POST"])
+def set_time():
+    data = request.get_json()
+
+    start_time_str = data["start_time"]
+    end_time_str = data["end_time"]
+
+    today = date.today()
+
+    start_dt = datetime.combine(
+        today,
+        datetime.strptime(start_time_str, "%H:%M").time()
+    )
+
+    end_dt = datetime.combine(
+        today,
+        datetime.strptime(end_time_str, "%H:%M").time()
+    )
+
+    if end_dt <= start_dt:
+        end_dt = end_dt.replace(day=end_dt.day + 1)
+
+    session["start_time"] = start_dt.isoformat()
+    session["end_time"] = end_dt.isoformat()
+
+    return {"status": "ok"}
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

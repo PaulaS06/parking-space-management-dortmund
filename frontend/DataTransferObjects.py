@@ -9,14 +9,16 @@ class ParkingRequestDto:
     longitude: float
     start_time: datetime
     end_time: datetime
+    ev_charging: bool
     limit: int = 5
 
     def to_query_params(self) -> dict:
         return {
             "lat": self.latitude,
             "lng": self.longitude,
-            "start_time": self.start_time.isoformat(),
-            "end_time": self.end_time.isoformat(),
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "ev_charging": self.ev_charging,
             "limit": self.limit
         }
 
