@@ -1,6 +1,10 @@
 let lastTimeout = null;
 
 document.getElementById("search").addEventListener("input", function () {
+  document.getElementById("submitBtn").disabled = true;
+});
+
+document.getElementById("search").addEventListener("input", function () {
   const query = this.value;
 
   clearTimeout(lastTimeout);
@@ -30,15 +34,31 @@ document.getElementById("search").addEventListener("input", function () {
             const lon = item.properties.lon;
             console.log("Koordinaten:", lat, lon);
             fetch("/set_location", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              lat: lat,
-              lon: lon
-            })
-          });
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  lat: lat,
+                  lon: lon
+                })
+              })
+              .then(res => {
+                if (!res.ok) {
+                  throw new Error("Backend-Fehler");
+                }
+                return res.json();
+              })
+              .then(data => {
+                if (data.status === "ok") {
+                  // ✅ Button aktivieren
+                  document.getElementById("submitBtn").disabled = false;
+                }
+              })
+              .catch(err => {
+                console.error(err);
+                document.getElementById("submitBtn").disabled = true;
+              });
           };
 
           list.appendChild(li);

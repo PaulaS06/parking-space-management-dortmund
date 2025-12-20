@@ -77,7 +77,7 @@ function updateParkingList(list) {
 }
 
 
-function searchParking() {
+async function searchParking() {
     const startTime = document.getElementById("startTime").value; // "HH:MM"
     const endTime = document.getElementById("endTime").value;
 
@@ -97,12 +97,10 @@ function searchParking() {
         console.error("Fehler beim Setzen der Zeit");
         return;
     }
-    console.log("posted time");
     // AJAX-Call
     const apiResponse = await fetch("/api/search");
     const data = await apiResponse.json();
 
     updateParkingList(data);
-    console.log("updated list");
 }
 

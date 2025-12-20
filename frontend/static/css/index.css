@@ -73,6 +73,10 @@ input[type="text"] {
 .submit-btn:active {
   background-color: #b9a30d;
 }
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .header {
     display: flex;
     justify-content: space-between;
