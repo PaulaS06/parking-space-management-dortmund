@@ -57,7 +57,7 @@ def autocomplete():
 @app.route("/set_filter", methods=["POST"])
 def set_filter():
     data = request.get_json()
-    session['ev_filter'] = data['ev_charging']
+    session['ev_filter'] = eval(data['ev_charging'])
     return {"status": "ok"}
 
 @app.route("/set_location", methods=["POST"])
@@ -69,10 +69,14 @@ def set_location():
 
     return jsonify({"status": "ok"})
 
+@app.route("/details")
+def details():
+    return render_template('details.html')
+
 @app.route("/api/search")
 def api_search():
     #results = PARKHOUSES
-    ev_filter = session.get('ev_filter')
+    ev_filter = session.get('ev_filter', False)
     lat = session.get('lat')
     lon = session.get('lon')
     start_time = session.get('start_time')

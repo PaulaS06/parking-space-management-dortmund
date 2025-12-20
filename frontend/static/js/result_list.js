@@ -8,7 +8,7 @@ function closeModal() {
 
 function applyFilter() {
     let checkbox = document.getElementById("evChargingCheckbox");
-    let ev = checkbox.checked ? "true" : "false";
+    let ev = checkbox.checked ? "True" : "False";
 
     fetch("/set_filter", {
         method: "POST",
@@ -30,6 +30,10 @@ function updateParkingList(list) {
     list.forEach(item => {
         const card = document.createElement("div");
         card.className = "card mb-1";
+        card.addEventListener("click", () => {
+            sessionStorage.setItem("selectedParking", JSON.stringify(item));
+            window.location.href = "/details";
+        });
 
         card.innerHTML = `
         <div class="card-body">
