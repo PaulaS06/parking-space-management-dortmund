@@ -75,6 +75,7 @@ def details():
 
 @app.route("/api/search")
 def api_search():
+    print("api_search")
     #results = PARKHOUSES
     ev_filter = session.get('ev_filter', False)
     lat = session.get('lat')
@@ -124,6 +125,7 @@ def set_time():
     session["start_time"] = start_dt.isoformat()
     session["end_time"] = end_dt.isoformat()
 
+    print("time set")
     return {"status": "ok"}
 
 if __name__ == '__main__':

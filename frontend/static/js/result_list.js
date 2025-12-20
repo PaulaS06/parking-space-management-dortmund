@@ -82,20 +82,27 @@ function searchParking() {
     const endTime = document.getElementById("endTime").value;
 
     console.log(startTime, endTime);
-    fetch("/set_time", {
+    const response = await fetch("/set_time", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+            "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          start_time: startTime,
-          end_time: endTime
+            start_time: startTime,
+            end_time: endTime
         })
     });
 
+    if (!response.ok) {
+        console.error("Fehler beim Setzen der Zeit");
+        return;
+    }
+    console.log("posted time");
     // AJAX-Call
-    fetch(`/api/search`)
-        .then(response => response.json())
-        .then(data => updateParkingList(data));
+    const apiResponse = await fetch("/api/search");
+    const data = await apiResponse.json();
+
+    updateParkingList(data);
+    console.log("updated list");
 }
 
