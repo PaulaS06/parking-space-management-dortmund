@@ -27,6 +27,14 @@ function updateParkingList(list) {
     let container = document.getElementById("parkingList");
     container.innerHTML = "";
 
+    if (!list || list.length === 0) {
+        container.innerHTML = `
+            <div class="text-muted text-center mt-3">
+                Keine Parkplätze verfügbar.
+            </div>`;
+        return;
+    }
+
     list.forEach(item => {
         const card = document.createElement("div");
         card.className = "card mb-1";
@@ -78,6 +86,7 @@ function updateParkingList(list) {
 
 
 async function searchParking() {
+    clearError();
     const startTime = document.getElementById("startTime").value; // "HH:MM"
     const endTime = document.getElementById("endTime").value;
 
@@ -97,10 +106,59 @@ async function searchParking() {
         console.error("Fehler beim Setzen der Zeit");
         return;
     }
-    // AJAX-Call
     const apiResponse = await fetch("/api/search");
-    const data = await apiResponse.json();
 
-    updateParkingList(data);
+    let payload = null;
+    try {
+        payload = await apiResponse.json();
+    } catch {
+        showError("Ungültige Serverantwort.");
+        return;
+    }
+
+    if (!apiResponse.ok) {
+        handleApiError(apiResponse.status, payload);
+        return;
+    }
+    updateParkingList(payload);
 }
 
+function showError(message) {
+    const box = document.getElementById("errorBox");
+    box.textContent = message;
+    box.classList.remove("d-none");
+}
+
+function clearError() {
+    const box = document.getElementById("errorBox");
+    box.textContent = "";
+    box.classList.add("d-none");
+}
+
+function handleApiError(status, payload) {
+    switch (status) {
+        case 400:
+            showError("Server error. Please try again later.");
+            break;
+
+        case 401:
+            showError("Server error. Please try again later.");
+            break;
+
+        case 404:
+            showError("No free parking houses found. Please try again later.");
+            updateParkingList([]); // Liste leeren
+            break;
+
+        case 502:
+            showError("Server not reachable. Please try again later.");
+            break;
+
+        case 500:
+            showError("Server error. Please try again later.");
+            break;
+
+        default:
+            showError("Unknown Error. Please try again later.");
+    }
+}

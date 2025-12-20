@@ -1,5 +1,6 @@
 # backend_rest_client.py
 import requests
+from Exceptions import BackendServerError, InvalidParameterError, NoResultsError, AuthFailedError
 from typing import List
 from DataTransferObjects import ParkingRequestDto, ParkingRecommendationDto
 
@@ -17,14 +18,27 @@ class BackendRestClient:
 
         url = f"{self.base_url}/api/v1/parkinghouses/walking"
 
-        response = requests.get(
-            url,
-            params=request.to_query_params(),
-            auth=self.auth,
-            timeout=self.timeout
-        )
+        try:
+            response = requests.get(
+                url,
+                params=request.to_query_params(),
+                auth=self.auth,
+                timeout=self.timeout
+            )
+        except requests.RequestException as e:
+            raise BackendServerError(f"Backend not reachable: {e}")
 
-        response.raise_for_status()
+        if response.status_code == 400:
+            raise InvalidParameterError("Invalid or missing request parameters")
+
+        if response.status_code == 401:
+            raise AuthFailedError("Authentication failed")
+
+        if response.status_code == 404:
+            raise NoResultsError("No parking garages found")
+
+        if response.status_code >= 500:
+            raise BackendServerError("Backend internal server error")
 
         return [
             ParkingRecommendationDto(**item)

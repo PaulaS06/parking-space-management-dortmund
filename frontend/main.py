@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, jsonify, session
 from flask_session import Session
-from DataTransferObjects import ParkingRequestDto, ParkingRecommendationDto
+from DataTransferObjects import ParkingRequestDto
 from BackendRestClient import BackendRestClient
 from datetime import timedelta, datetime, date
+from Exceptions import BackendServerError, InvalidParameterError, NoResultsError, AuthFailedError
 import requests
 
 GEOAPIFY_API_KEY = "e2a0ea3f5d5e4efd819ad7345c90e18b"
@@ -95,11 +96,25 @@ def api_search():
 
     try:
         results = backend_client.get_parking_recommendations(request_dto)
+        return jsonify([r.__dict__ for r in results]), 200
 
-        return jsonify([r.__dict__ for r in results])
+    except InvalidParameterError as e:
+        return jsonify({"error": str(e)}), 400
+
+    except AuthFailedError as e:
+        return jsonify({"error": str(e)}), 401
+
+    except NoResultsError as e:
+        return jsonify({
+            "error": str(e),
+            "results": []
+        }), 404
+
+    except BackendServerError as e:
+        return jsonify({"error": str(e)}), 502  # Bad Gateway
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Unexpected error"}), 500
 
 @app.route("/set_time", methods=["POST"])
 def set_time():
