@@ -11,7 +11,6 @@ app = Flask(__name__)
 # URLs and API Keys
 # -------------------------------
 DORTMUND_URL = "https://open-data.dortmund.de/api/explore/v2.1/catalog/datasets/parkhauser/records"
-GEOAPIFY_GEOCODE_KEY = "e49de089f7b64863bb39e194ddf6152b"
 GEOAPIFY_ROUTING_KEY = "9a49c37eba2c4a87ac26e3610becac2b"
 
 # -------------------------------
@@ -85,17 +84,7 @@ def fetch_and_save_parking_data():
                 if lat is None or lon is None:
                     continue
 
-                # Reverse geocoding 
-                full_address = None
-                try:
-                    url_geo = "https://api.geoapify.com/v1/geocode/reverse"
-                    params = {"lat": lat, "lon": lon, "apiKey": "113dd9887da44fccb992d13abcb5f11f"}
-                    resp_geo = requests.get(url_geo, params=params, timeout=5).json()
-                    features = resp_geo.get("features", [])
-                    if features:
-                        full_address = features[0].get("properties", {}).get("formatted")
-                except Exception as e:
-                    print("Error reverse geocoding:", e)
+                
 
                 all_records.append({
                     "id": p.get("id"),
@@ -104,7 +93,7 @@ def fetch_and_save_parking_data():
                     "lon": lon,
                     "capacity": p.get("capacity"),
                     "free_spots": p.get("frei"),
-                    "full_address": full_address,
+                    #"full_address": full_address,
                     "mostart": p.get("mostart"),
                     "moende": p.get("moende"),
                     "distart": p.get("distart"),
@@ -140,42 +129,45 @@ def fetch_and_save_parking_data():
 # -------------------------------
 # Geocoding user address
 # -------------------------------
-def geocode_address(address):
-    address = address.replace('ß', 'ss')
-    url = "https://api.geoapify.com/v1/geocode/search"
-    params = {"text": address, "apiKey": GEOAPIFY_GEOCODE_KEY}
-    try:
-        resp = requests.get(url, params=params, timeout=5).json()
-        features = resp.get("features", [])
-        if features:
-            lon, lat = features[0]["geometry"]["coordinates"]
-            return lat, lon
-    except Exception as e:
-        print("Error geocoding user address:", e)
-    return None, None
+
 
 # -------------------------------
 # Routing Geoapify
 # -------------------------------
-def geoapify_routing(origin_lat, origin_lon, dest_lat, dest_lon, mode="walk"):
-    url = "https://api.geoapify.com/v1/routing"
-    waypoints = f"{origin_lat},{origin_lon}|{dest_lat},{dest_lon}"
-    params = {
-        "waypoints": waypoints,
+def geoapify_routing_matrix(user_lat, user_lon, parkings, mode="walk"):
+    url = "https://api.geoapify.com/v1/routematrix"
+    headers = {"Content-Type": "application/json"}
+
+    body = {
         "mode": mode,
-        "apiKey": GEOAPIFY_ROUTING_KEY
+        "sources": [{"location": [user_lon, user_lat]}],
+        "targets": [{"location": [p["longitude"], p["latitude"]]} for p in parkings]
+        
+
     }
+    print("Sources:", body["sources"])
+    print("Targets:", body["targets"])
+
+    params = {"apiKey": GEOAPIFY_ROUTING_KEY}
+
     try:
-        resp = requests.get(url, params=params, timeout=5).json()
-        features = resp.get("features", [])
-        if features:
-            props = features[0].get("properties", {})
-            distance = props.get("distance")
-            duration = props.get("time")
-            return distance, duration
+        resp = requests.post(url, json=body, params=params, headers=headers, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+
+        results = data.get("sources_to_targets", [])
+        if not results or not results[0]:
+            print("Routing matrix returned no data")
+            return None, None
+
+        distances = [item["distance"] for item in results[0]]
+        durations = [item["time"] for item in results[0]]
+
+        return distances, durations
+
     except Exception as e:
-        print(f"Error routing:", e)
-    return None, None
+        print("Routing matrix error:", e)
+        return None, None
 
 # -------------------------------
 # Endpoint: closest parking houses
@@ -246,12 +238,13 @@ def parking_is_available(parking, start_dt, end_dt):
 # ---------------------------------------------------------
 @app.route("/api/v1/parkinghouses/walking", methods=["GET"])
 def nearest_parking():
-    address = request.args.get("address", type=str)
+    
     user_lat = request.args.get("lat", type=float)
     user_lon = request.args.get("lon", type=float)
-    limit = request.args.get("limit", type=int)
     start_str = request.args.get("start_time")
     end_str = request.args.get("end_time")
+    ev_charging = request.args.get("Ev_charging", type=bool)
+    limit = request.args.get("limit", type=int)
 
     if not start_str or not end_str:
         return {"error": "start_time and end_time are required"}, 400
@@ -259,8 +252,6 @@ def nearest_parking():
     start_dt = datetime.fromisoformat(start_str.replace("Z", ""))
     end_dt = datetime.fromisoformat(end_str.replace("Z", ""))
 
-    if address and (user_lat is None or user_lon is None):
-        user_lat, user_lon = geocode_address(address)
 
     if user_lat is None or user_lon is None:
         return {"error": "You should send coordinates or a valid address"}, 400
@@ -298,21 +289,29 @@ def nearest_parking():
 
         available.append(filtered)
 
-    # available.sort(key=lambda x: x["distance_haversine_km"])
+    available.sort(key=lambda x: x["distance_haversine_km"])
     nearest_5 = available[:limit]
-    for p in nearest_5:
-        p.pop("id", None)
-        p.pop("distance_haversine_km", None)
 
    
-    for p in nearest_5:
-        distance, duration = geoapify_routing(user_lat, user_lon, p["latitude"], p["longitude"], mode="walk")
+    distances, durations = geoapify_routing_matrix(
+    user_lat,
+    user_lon,
+    nearest_5,
+    mode="walk"
+)
 
-        p["walkingDistanceInKm"] = round(distance / 1000, 3) if distance else None
-        p["walkingTimeMinutes"] = round(duration / 60, 2) if duration else None
-   
-
-    save_json(nearest_5, "nearest_output.json")
+    if distances and durations:
+        for i, p in enumerate(nearest_5):
+            p["walkingDistanceInKm"] = round(distances[i] / 1000, 3) if distances[i] else None
+            p["walkingTimeMinutes"] = round(durations[i] / 60, 2) if durations[i] else None
+    else:
+        for p in nearest_5:
+            p["walkingDistanceInKm"] = None
+            p["walkingTimeMinutes"] = None
+            
+    
+    nearest_5.sort(key=lambda x: x["walkingDistanceInKm"])
+    #save_json(nearest_5, "nearest_output.json")
     return jsonify(nearest_5)
 
 
