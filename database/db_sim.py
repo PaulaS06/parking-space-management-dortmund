@@ -53,6 +53,7 @@ def calculate_price(start_time, end_time):
 @app.route("/api/v1/database", methods=["POST"])
 def get_parking_info_bulk():
     data = request.json
+    save_json(data, "sent_from_backend")
 
     
     if not data or not isinstance(data, list):
@@ -75,11 +76,11 @@ def get_parking_info_bulk():
 
         results.append({
             "id": parking_id,
-            "full_address": parking["full_address"],
-            "ev_charging": random.choice([True, False]),
-            "Total_price": calculate_price(start_time, end_time)
+            "fullAddress": parking["full_address"],
+            "evCharging": random.choice([True, False]),
+            "priceTotal": calculate_price(start_time, end_time)
         })
-    #save_json(data,"db_received")
+    
     return jsonify(results)
 
 

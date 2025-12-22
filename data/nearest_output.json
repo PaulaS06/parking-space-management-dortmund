@@ -5,8 +5,8 @@
         "latitude": 51.506905,
         "longitude": 7.4591284,
         "capacity": 182,
-        "evCharging": true,
-        "priceTotal": 14.39,
+        "evCharging": false,
+        "priceTotal": 14.2,
         "walkingTimeMinutes": 5.9,
         "walkingDistanceInKm": 0.35
     },
@@ -17,7 +17,7 @@
         "longitude": 7.456745,
         "capacity": 115,
         "evCharging": true,
-        "priceTotal": 14.47,
+        "priceTotal": 6.8,
         "walkingTimeMinutes": 12.87,
         "walkingDistanceInKm": 0.869
     },
@@ -28,7 +28,7 @@
         "longitude": 7.4643874,
         "capacity": 2,
         "evCharging": true,
-        "priceTotal": 7.55,
+        "priceTotal": 12.32,
         "walkingTimeMinutes": 15.98,
         "walkingDistanceInKm": 1.017
     },
@@ -39,9 +39,42 @@
         "longitude": 7.464931,
         "capacity": 2,
         "evCharging": true,
-        "priceTotal": 11.21,
+        "priceTotal": 14.9,
         "walkingTimeMinutes": 21.0,
         "walkingDistanceInKm": 1.339
+    },
+    {
+        "name": "Hauptbahnhof",
+        "fullAddress": "Königswall, 44137 Dortmund, Germany",
+        "latitude": 51.51672,
+        "longitude": 7.457335,
+        "capacity": 114,
+        "evCharging": false,
+        "priceTotal": 5.21,
+        "walkingTimeMinutes": 22.88,
+        "walkingDistanceInKm": 1.592
+    },
+    {
+        "name": "Kuckelke",
+        "fullAddress": "Kuckelke 3, 44135 Dortmund, Germany",
+        "latitude": 51.516224,
+        "longitude": 7.46911,
+        "capacity": 5,
+        "evCharging": false,
+        "priceTotal": 14.31,
+        "walkingTimeMinutes": 25.0,
+        "walkingDistanceInKm": 1.689
+    },
+    {
+        "name": "Alte Post / NH Hotel",
+        "fullAddress": "NH Dortmund, Königswall 1, 44137 Dortmund, Germany",
+        "latitude": 51.517475,
+        "longitude": 7.462023700000044,
+        "capacity": 153,
+        "evCharging": false,
+        "priceTotal": 8.51,
+        "walkingTimeMinutes": 25.25,
+        "walkingDistanceInKm": 1.695
     },
     {
         "name": "P&R Westfalenpark",
@@ -49,8 +82,8 @@
         "latitude": 51.49663,
         "longitude": 7.465905,
         "capacity": 156,
-        "evCharging": true,
-        "priceTotal": 10.57,
+        "evCharging": false,
+        "priceTotal": 8.93,
         "walkingTimeMinutes": 27.05,
         "walkingDistanceInKm": 1.729
     },
@@ -60,10 +93,21 @@
         "latitude": 51.52291,
         "longitude": 7.443771399999989,
         "capacity": 384,
-        "evCharging": true,
-        "priceTotal": 7.06,
+        "evCharging": false,
+        "priceTotal": 5.09,
         "walkingTimeMinutes": 36.25,
         "walkingDistanceInKm": 2.505
+    },
+    {
+        "name": "P&R Schulte-Rödding",
+        "fullAddress": "Innsbruckstraße 7, 44339 Dortmund, Germany",
+        "latitude": 51.549355,
+        "longitude": 7.489934399999955,
+        "capacity": 568,
+        "evCharging": false,
+        "priceTotal": 9.84,
+        "walkingTimeMinutes": 87.62,
+        "walkingDistanceInKm": 5.868
     },
     {
         "name": "P&R Hauptfriedhof",
@@ -71,8 +115,8 @@
         "latitude": 51.507725,
         "longitude": 7.533066,
         "capacity": 572,
-        "evCharging": true,
-        "priceTotal": 11.03,
+        "evCharging": false,
+        "priceTotal": 9.13,
         "walkingTimeMinutes": 92.17,
         "walkingDistanceInKm": 6.017
     }

@@ -141,16 +141,16 @@ def enrich_parking_info(parkings, start_time, end_time):
         resp = requests.post(url, json=payload, timeout=10)
         resp.raise_for_status()
         db_data = resp.json()  # List of dicts with id, ev_charging, Total_price, full_address
-        #save_json(db_data,"results_db")
+        save_json(db_data,"results_db")
         # Create a dict fast to look for id
         db_dict = {item["id"]: item for item in db_data}
 
         # Add microservice info to json file that already exists
         for p in parkings:
             info = db_dict.get(p["id"], {})
-            p["evCharging"] = info.get("ev_charging", False)
-            p["priceTotal"] = info.get("Total_price", 0.0)
-            p["fullAddress"] = info.get("full_address", p.get("fullAddress"))
+            p["evCharging"] = info.get("evCharging", False)
+            p["priceTotal"] = info.get("priceTotal", 0.0)
+            p["fullAddress"] = info.get("fullAddress", p.get("fullAddress"))
 
         return parkings
 

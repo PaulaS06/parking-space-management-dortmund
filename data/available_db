@@ -5,8 +5,8 @@
         "lat": 51.507725,
         "lon": 7.533066,
         "free_spots": 572,
-        "evCharging": true,
-        "priceTotal": 11.03,
+        "evCharging": false,
+        "priceTotal": 9.13,
         "fullAddress": "Auf dem Steine 33, 44143 Dortmund, Germany"
     },
     {
@@ -15,8 +15,8 @@
         "lat": 51.52291,
         "lon": 7.443771399999989,
         "free_spots": 384,
-        "evCharging": true,
-        "priceTotal": 7.06,
+        "evCharging": false,
+        "priceTotal": 5.09,
         "fullAddress": "Dr.-Safiye-Ali-Straße 13, 44147 Dortmund, Germany"
     },
     {
@@ -26,7 +26,7 @@
         "lon": 7.457335,
         "free_spots": 114,
         "evCharging": false,
-        "priceTotal": 5.87,
+        "priceTotal": 5.21,
         "fullAddress": "Königswall, 44137 Dortmund, Germany"
     },
     {
@@ -36,7 +36,7 @@
         "lon": 7.4643874,
         "free_spots": 2,
         "evCharging": true,
-        "priceTotal": 7.55,
+        "priceTotal": 12.32,
         "fullAddress": "Hansaplatz 1, 44137 Dortmund, Germany"
     },
     {
@@ -46,7 +46,7 @@
         "lon": 7.456745,
         "free_spots": 115,
         "evCharging": true,
-        "priceTotal": 14.47,
+        "priceTotal": 6.8,
         "fullAddress": "Johannesstraße 9-17, 44137 Dortmund, Germany"
     },
     {
@@ -55,8 +55,8 @@
         "lat": 51.49663,
         "lon": 7.465905,
         "free_spots": 156,
-        "evCharging": true,
-        "priceTotal": 10.57,
+        "evCharging": false,
+        "priceTotal": 8.93,
         "fullAddress": "Joseph-Scherer-Straße 10, 44139 Dortmund, Germany"
     },
     {
@@ -65,8 +65,8 @@
         "lat": 51.506905,
         "lon": 7.4591284,
         "free_spots": 182,
-        "evCharging": true,
-        "priceTotal": 14.39,
+        "evCharging": false,
+        "priceTotal": 14.2,
         "fullAddress": "Hohe Straße 33, 44139 Dortmund, Germany"
     },
     {
@@ -76,7 +76,7 @@
         "lon": 7.489934399999955,
         "free_spots": 568,
         "evCharging": false,
-        "priceTotal": 11.67,
+        "priceTotal": 9.84,
         "fullAddress": "Innsbruckstraße 7, 44339 Dortmund, Germany"
     },
     {
@@ -86,7 +86,7 @@
         "lon": 7.462023700000044,
         "free_spots": 153,
         "evCharging": false,
-        "priceTotal": 9.47,
+        "priceTotal": 8.51,
         "fullAddress": "NH Dortmund, Königswall 1, 44137 Dortmund, Germany"
     },
     {
@@ -96,7 +96,7 @@
         "lon": 7.464931,
         "free_spots": 2,
         "evCharging": true,
-        "priceTotal": 11.21,
+        "priceTotal": 14.9,
         "fullAddress": "Hohe Luft 6, 44135 Dortmund, Germany"
     },
     {
@@ -106,7 +106,7 @@
         "lon": 7.46911,
         "free_spots": 5,
         "evCharging": false,
-        "priceTotal": 10.02,
+        "priceTotal": 14.31,
         "fullAddress": "Kuckelke 3, 44135 Dortmund, Germany"
     }
 ]
