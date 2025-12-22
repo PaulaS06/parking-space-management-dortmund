@@ -1,64 +1,33 @@
-<!DOCTYPE html>
+{% extends "layout.html" %}
 
-<html lang="en">
+{% block extra_js %}
+<script src="static/js/location.js" defer></script>
+{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title> Nearby Window </title>
+{% block extra_css %}
+<link rel="stylesheet" href="static/css/nearby.css">
+{% endblock %}
 
-    <link rel="stylesheet" href="static/css/nearby.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block content %}
+    <div class="header">
+        <img src="static/images/logo.png" alt="logo" class="header-img">
+        <h1>ParkEasy</h1>
+        <div class="user-icon-circle">
+            <i class="fas fa-user"></i>
+        </div>        
+    </div>
 
-    <script src="static/js/location.js" defer></script> 
-
-</head>
-
-<body>
-    <div class="container">
-        <div class="header">
-            <img src="static/images/logo.png" alt="Imagen Izquierda" class="header-img">
-            <h1>ParkEasy</h1>
-            <div class="user-icon-circle">
-                <i class="fas fa-user"></i> 
-            </div>        
-        </div>
+    <div class="location">
+        <input type="text" id="location_input" class="form-control" placeholder="My location" autocomplete="off">
         
-        <input type="text" id="starting_code" name="starting_code" placeholder="My location" required>
-        <button type="submit" class="submit-btn">Look Around</button>
-
-        <label id="location-label" for="sta
-        rting_code"></label>
-
-
-        <div class="title-row">
-            <h2>Nearby Parking</h2>
-            <a href="#">View All</a>
-        </div>
+        <ul id="locationDropdown" class="location-dropdown d-none">
+            <li id="getLocationOption">
+                <i class="bi bi-geo-alt"></i> Get current location
+            </li>
+        </ul>
     </div>
-
-    <nav class="fixed-bottom d-flex justify-content-center mb-3">
-    <div class="navbar navbar-dark bg-dark shadow rounded-pill px-4 py-2" style="max-width: 400px;">
-        <div class="d-flex justify-content-between" style="width: 150px;">
-
-            <a class="nav-link text-white text-center d-flex flex-column align-items-center"
-                href="{{ url_for('home') }}">
-                <i class="bi bi-search fs-5"></i>
-                <span class="small">Search</span>
-            </a>
-
-            <a class="nav-link text-white text-center d-flex flex-column align-items-center"
-                href="{{ url_for('nearby') }}">
-                <i class="bi bi-geo-alt fs-5"></i>
-                <span class="small">Nearby</span>
-            </a>
-        </div>
+    
+    <div class="row g-3 justify-content-center time-div">
+        <button id="submitBtn" type="submit" class="submit-btn" disabled>Look Around</button>
     </div>
-    </nav>
-
-</body>
-</html>
+{% endblock %}
