@@ -51,7 +51,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * c
 
 # -------------------------------
-# Obtain all parking houses and save json file with addresses
+# Obtain all parking houses and save json file processed
 # -------------------------------
 def fetch_and_save_parking_data():
     all_records = []
@@ -118,17 +118,48 @@ def fetch_and_save_parking_data():
 
     # Save raw data
     print(len(raw_records))
-    save_json(raw_records, "dortmund_parkings_raw.json")
+    #save_json(raw_records, "dortmund_parkings_raw.json")
 
-    # Save parkign houses with addresses
-    save_json(all_records, "dortmund_parkings_with_address.json")
+    # Save parking houses processed
+    save_json(all_records, "dortmund_parkings_processed.json")
 
     return all_records
 
 
-# -------------------------------
-# Geocoding user address
-# -------------------------------
+import requests
+
+def enrich_parking_info(parkings, start_time, end_time):
+    """
+    Receives list of parkings with id and send it to microservice to get
+    ev_charging, Total_price y full_address. Then updates each parking
+    of the list with that info.
+    """
+    url = "http://localhost:5001/api/v1/database"  #URL DATABASE MICROSERVICE
+    payload = [{"id": p["id"], "start_time": start_time, "end_time": end_time} for p in parkings]
+
+    try:
+        resp = requests.post(url, json=payload, timeout=10)
+        resp.raise_for_status()
+        db_data = resp.json()  # List of dicts with id, ev_charging, Total_price, full_address
+        #save_json(db_data,"results_db")
+        # Create a dict fast to look for id
+        db_dict = {item["id"]: item for item in db_data}
+
+        # Add microservice info to json file that already exists
+        for p in parkings:
+            info = db_dict.get(p["id"], {})
+            p["evCharging"] = info.get("ev_charging", False)
+            p["priceTotal"] = info.get("Total_price", 0.0)
+            p["fullAddress"] = info.get("full_address", p.get("fullAddress"))
+
+        return parkings
+
+    except Exception as e:
+        print("Error fetching parking info:", e)
+        # If it fails, returns original parkings with modification
+        return parkings
+
+
 
 
 # -------------------------------
@@ -169,10 +200,7 @@ def geoapify_routing_matrix(user_lat, user_lon, parkings, mode="walk"):
         print("Routing matrix error:", e)
         return None, None
 
-# -------------------------------
-# Endpoint: closest parking houses
-# -------------------------------
-from datetime import datetime, time
+
 
 # -----------------------------------------
 # Funtion that verifies availability
@@ -256,41 +284,63 @@ def nearest_parking():
     if user_lat is None or user_lon is None:
         return {"error": "You should send coordinates or a valid address"}, 400
 
-    parkings = load_json("dortmund_parkings_with_address.json")
+    parkings = load_json("dortmund_parkings_processed.json")
     if not parkings:
         parkings = fetch_and_save_parking_data()
 
     available = []
     for p in parkings:
-
         if not p.get("free_spots") or p["free_spots"] <= 0:
             continue
-
         if not parking_is_available(p, start_dt, end_dt):
             continue
-
-        d_km = haversine(user_lat, user_lon, p["lat"], p["lon"])
-
-
-        filtered = {
-            "id": p.get("id"),
+        available.append({
+            "id":p.get("id"),
             "name": p.get("name"),
-            "fullAddress": p.get("full_address"),
-            "latitude": p.get("lat"),
-            "longitude": p.get("lon"),
-            "capacity": p.get("free_spots", 0),  # Available spots
-            "distance_haversine_km": round(d_km, 3),
-            "evCharging": False,  # Default to False, can be enhanced with real data
-            "priceTotal": 0.0,  # Default price, can be calculated based on duration,
-            "walkingTimeMinutes": None,
-            "walkingDistanceInKm": None
+            "lat": p.get("lat"),
+            "lon": p.get("lon"),
+            "free_spots": p.get("free_spots")
+            
+        })
+                    
 
-        }
+    #save_json(available,"available_spots")
+    available = enrich_parking_info(available, start_str, end_str)
+    save_json(available, "available_db")
+    if ev_charging:
+        available = [p for p in available if p.get("evCharging")]
 
-        available.append(filtered)
+    
+    for p in available:
+        p["distance_haversine_km"] = round(haversine(user_lat, user_lon, p["lat"], p["lon"]), 3)
 
     available.sort(key=lambda x: x["distance_haversine_km"])
     nearest_5 = available[:limit]
+
+    
+    response = []
+
+    for p in nearest_5:
+                          
+        response.append({
+            
+            "name": p.get("name"),
+            "fullAddress": p.get("fullAddress"),
+            "latitude": p.get("lat"),
+            "longitude": p.get("lon"),
+            "capacity": p.get("free_spots", 0),
+            "evCharging": p.get("evCharging"),
+            "priceTotal": p.get("priceTotal"),
+            "walkingTimeMinutes": None,
+            "walkingDistanceInKm": None
+        })
+
+
+
+
+    
+    #save_json(response,"Haversine")
+    nearest_5 = response[:limit]
 
    
     distances, durations = geoapify_routing_matrix(
@@ -311,7 +361,8 @@ def nearest_parking():
             
     
     nearest_5.sort(key=lambda x: x["walkingDistanceInKm"])
-    #save_json(nearest_5, "nearest_output.json")
+
+    save_json(nearest_5, "nearest_output.json")
     return jsonify(nearest_5)
 
 
@@ -321,8 +372,9 @@ def home():
 
 if __name__ == "__main__":
     # Create JSON of parking houses once when it starts
-    if not os.path.exists(os.path.join(DATA_DIR, "dortmund_parkings_with_address.json")):
+    if not os.path.exists(os.path.join(DATA_DIR, "dortmund_parkings_processed.json")):
         fetch_and_save_parking_data()
+
     # Only enable debug mode if DEBUG environment variable is set
     debug_mode = os.environ.get("DEBUG", "False").lower() == "true"
     app.run(host="0.0.0.0", port=8000, debug=debug_mode)

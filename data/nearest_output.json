@@ -1,14 +1,79 @@
 [
     {
-        "id": "107394",
+        "name": "Klinikum Dortmund",
+        "fullAddress": "Hohe Straße 33, 44139 Dortmund, Germany",
+        "latitude": 51.506905,
+        "longitude": 7.4591284,
+        "capacity": 182,
+        "evCharging": true,
+        "priceTotal": 14.39,
+        "walkingTimeMinutes": 5.9,
+        "walkingDistanceInKm": 0.35
+    },
+    {
         "name": "St.-Johannes-Hospital",
-        "fullAddress": "St. Johannes Hospital, Johannesstraße 9-17, 44137 Dortmund, Germany",
-        "lat": 51.510727,
-        "lon": 7.456745,
-        "capacity": 396,
-        "freeSpots": 231,
-        "distance_haversine_km": 0.494,
-        "walkingDistanceInKm": 0.996,
-        "walkingTimeMinutes": 15.08
+        "fullAddress": "Johannesstraße 9-17, 44137 Dortmund, Germany",
+        "latitude": 51.510727,
+        "longitude": 7.456745,
+        "capacity": 115,
+        "evCharging": true,
+        "priceTotal": 14.47,
+        "walkingTimeMinutes": 12.87,
+        "walkingDistanceInKm": 0.869
+    },
+    {
+        "name": "Hansaplatz / Karstadt",
+        "fullAddress": "Hansaplatz 1, 44137 Dortmund, Germany",
+        "latitude": 51.51304,
+        "longitude": 7.4643874,
+        "capacity": 2,
+        "evCharging": true,
+        "priceTotal": 7.55,
+        "walkingTimeMinutes": 15.98,
+        "walkingDistanceInKm": 1.017
+    },
+    {
+        "name": "Bissenkamp",
+        "fullAddress": "Hohe Luft 6, 44135 Dortmund, Germany",
+        "latitude": 51.515503,
+        "longitude": 7.464931,
+        "capacity": 2,
+        "evCharging": true,
+        "priceTotal": 11.21,
+        "walkingTimeMinutes": 21.0,
+        "walkingDistanceInKm": 1.339
+    },
+    {
+        "name": "P&R Westfalenpark",
+        "fullAddress": "Joseph-Scherer-Straße 10, 44139 Dortmund, Germany",
+        "latitude": 51.49663,
+        "longitude": 7.465905,
+        "capacity": 156,
+        "evCharging": true,
+        "priceTotal": 10.57,
+        "walkingTimeMinutes": 27.05,
+        "walkingDistanceInKm": 1.729
+    },
+    {
+        "name": "P&R Hafen",
+        "fullAddress": "Dr.-Safiye-Ali-Straße 13, 44147 Dortmund, Germany",
+        "latitude": 51.52291,
+        "longitude": 7.443771399999989,
+        "capacity": 384,
+        "evCharging": true,
+        "priceTotal": 7.06,
+        "walkingTimeMinutes": 36.25,
+        "walkingDistanceInKm": 2.505
+    },
+    {
+        "name": "P&R Hauptfriedhof",
+        "fullAddress": "Auf dem Steine 33, 44143 Dortmund, Germany",
+        "latitude": 51.507725,
+        "longitude": 7.533066,
+        "capacity": 572,
+        "evCharging": true,
+        "priceTotal": 11.03,
+        "walkingTimeMinutes": 92.17,
+        "walkingDistanceInKm": 6.017
     }
 ]
