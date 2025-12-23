@@ -2,6 +2,7 @@
 
 {% block extra_js %}
 <script src="static/js/location.js" defer></script>
+<script src="static/js/search_suggestions.js" defer></script>
 {% endblock %}
 
 {% block extra_css %}
@@ -26,8 +27,11 @@
             </li>
         </ul>
     </div>
-    
+
     <div class="row g-3 justify-content-center time-div">
-        <button id="submitBtn" type="submit" class="submit-btn" disabled>Look Around</button>
+        <button id="submitBtn" type="submit" class="submit-btn" onclick="searchParking()" disabled>Look Around</button>
     </div>
+
+    <ul id="parkingList" class="result-list"></ul>
+
 {% endblock %}
