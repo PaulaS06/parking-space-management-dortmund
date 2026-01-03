@@ -7,7 +7,7 @@
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     box-sizing: border-box;
     text-align: center;
 }
@@ -20,6 +20,7 @@ body {
     margin: 0;
     padding: 0;
     letter-spacing: 1px;
+    min-height: 100vh;
 }
 
 /* Desktop: Container begrenzen und zentrieren */
@@ -27,13 +28,13 @@ body {
     body {
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
         height: 100vh;
     }
 
     .container {
         width: 600px;     /* Desktopbreite */
-        height: 90vh;     /* Höhe automatisch */
+        min-height: 90vh;     /* Höhe automatisch */
     }
 }
 
