@@ -94,12 +94,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const fakePayload = [
             {
                 name: "Parking Test 1",
+                adress: "123 Test St",
                 capacity: 10,
                 priceTotal: 5,
                 walkingTimeMinutes: 3
             },
             {
                 name: "Parking Test 2",
+                adress: "456 Example Ave",
                 capacity: 2,
                 priceTotal: 3,
                 walkingTimeMinutes: 5

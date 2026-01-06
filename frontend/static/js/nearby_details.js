@@ -7,7 +7,9 @@ if (!parking) {
 
 document.getElementById("parkingName").textContent = parking.name;
 document.getElementById("parkingAddress").textContent = parking.fullAddress;
-document.getElementById("priceTotal").textContent = parking.priceTotal + " €";
+document.getElementById("pricePerHour").textContent = parking.pricePerHour + " €";
+document.getElementById("distance").textContent =
+    `${parking.drivingDistanceKm} km • ${parking.drivingTimeMinutes} min`;
 
 document.getElementById("evCharging").textContent =
     parking.evCharging ? "Available" : "Not available";

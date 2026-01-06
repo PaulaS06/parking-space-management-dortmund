@@ -75,7 +75,7 @@ def details():
     return render_template('details.html')
 
 @app.route("/nearby_details")
-def details():
+def nearby_details():
     return render_template('nearby_details.html')
 
 @app.route("/api/search")

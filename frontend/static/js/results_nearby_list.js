@@ -15,7 +15,7 @@ function updateParkingList(list) {
         card.className = "card mb-1";
         card.addEventListener("click", () => {
             sessionStorage.setItem("selectedParking", JSON.stringify(item));
-            window.location.href = "/details_nearby";
+            window.location.href = "/nearby_details";
         });
 
         card.innerHTML = `
@@ -31,7 +31,7 @@ function updateParkingList(list) {
                     <td></td>
                     <td class="table-cell-right">
                         <img class="parking-img" src="${item.capacity > 5 ? 'static/images/green-parking-lot.png' : 'static/images/red-parking-lot.png'}"
-                         alt="status">
+                        alt="status">
                     </td>
                 </tr>
                 <tr>
@@ -45,6 +45,9 @@ function updateParkingList(list) {
                         <p class="card-text">
                             ${item.priceTotal}€
                         </p>
+                    </td>
+                    <td class="table-cell-right">
+                        <p class="card-text">${item.drivingTimeMinutes} min by car</p>
                     </td>
                 </tr>
             </tbody>
