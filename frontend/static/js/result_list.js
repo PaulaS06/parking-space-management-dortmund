@@ -87,40 +87,45 @@ function updateParkingList(list) {
 
 async function searchParking() {
     clearError();
-    const startTime = document.getElementById("startTime").value; // "HH:MM"
-    const endTime = document.getElementById("endTime").value;
+    showLoading();
+    try{
+        const startTime = document.getElementById("startTime").value; // "HH:MM"
+        const endTime = document.getElementById("endTime").value;
 
-    console.log(startTime, endTime);
-    const response = await fetch("/set_time", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            start_time: startTime,
-            end_time: endTime
-        })
-    });
+        console.log(startTime, endTime);
+        const response = await fetch("/set_time", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                start_time: startTime,
+                end_time: endTime
+            })
+        });
 
-    if (!response.ok) {
-        console.error("Fehler beim Setzen der Zeit");
-        return;
+        if (!response.ok) {
+            console.error("Fehler beim Setzen der Zeit");
+            return;
+        }
+        const apiResponse = await fetch("/api/search");
+
+        let payload = null;
+        try {
+            payload = await apiResponse.json();
+        } catch {
+            showError("Ungültige Serverantwort.");
+            return;
+        }
+
+        if (!apiResponse.ok) {
+            handleApiError(apiResponse.status, payload);
+            return;
+        }
+        updateParkingList(payload);
+    } finally {
+        hideLoading();
     }
-    const apiResponse = await fetch("/api/search");
-
-    let payload = null;
-    try {
-        payload = await apiResponse.json();
-    } catch {
-        showError("Ungültige Serverantwort.");
-        return;
-    }
-
-    if (!apiResponse.ok) {
-        handleApiError(apiResponse.status, payload);
-        return;
-    }
-    updateParkingList(payload);
 }
 
 function showError(message) {
@@ -161,4 +166,12 @@ function handleApiError(status, payload) {
         default:
             showError("Unknown Error. Please try again later.");
     }
+}
+
+function showLoading() {
+    document.getElementById("loadingOverlay").classList.remove("d-none");
+}
+
+function hideLoading() {
+    document.getElementById("loadingOverlay").classList.add("d-none");
 }

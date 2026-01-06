@@ -24,6 +24,11 @@ document.getElementById("capacityText").textContent =
 const button = document.getElementById("mapsLink");
 
 button.addEventListener("click", () => {
-    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${parking.latitude},${parking.longitude}`;
+    const isAppleDevice = /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent);
+
+    const mapsUrl = isAppleDevice
+        ? `https://maps.apple.com/?daddr=${parking.latitude},${parking.longitude}`
+        : `https://www.google.com/maps/dir/?api=1&destination=${parking.latitude},${parking.longitude}`;
+
     window.open(mapsUrl, "_blank");
 });
