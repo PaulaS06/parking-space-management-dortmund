@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
 
 {% block extra_js %}
-<script src="static/js/location.js" defer></script>
+<script src="static/js/nearby_location.js" defer></script>
 <script src="static/js/nearby_suggestions.js" defer></script>
+<script src="/static/js/results_nearby_list.js"></script>
 {% endblock %}
 
 {% block extra_css %}
@@ -29,7 +30,7 @@
     </div>
 
     <div class="row g-3 justify-content-center time-div">
-        <button id="submitBtn" type="submit" class="submit-btn" onclick="searchParking()" disabled>Look Around</button>
+        <button id="submitBtn" type="button" class="submit-btn" disabled>Look Around</button>
     </div>
 
     <ul id="parkingList" class="result-list"></ul>
