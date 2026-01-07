@@ -77,7 +77,7 @@ def get_parking_info_bulk():
         results.append({
             "id": parking_id,
             "fullAddress": parking["full_address"],
-            "evCharging": random.choice([True, False]),
+            "evCharging": 'True', #random.choice([True, False]),
             "priceTotal": calculate_price(start_time, end_time)
         })
     
