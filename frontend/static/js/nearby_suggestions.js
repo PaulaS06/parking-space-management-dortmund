@@ -1,7 +1,7 @@
 const submitBtn = document.getElementById("submitBtn");
 const locationInput = document.getElementById("location_input");
 
-submitBtn.disabled = true; // empieza deshabilitado
+submitBtn.disabled = true;
 
 document.getElementById("getLocationOption").addEventListener("click", () => {
     if (!navigator.geolocation) {
@@ -13,7 +13,6 @@ document.getElementById("getLocationOption").addEventListener("click", () => {
         async (position) => {
             const { latitude, longitude } = position.coords;
 
-            // Obtener dirección
             let address = "Unknown location";
             try {
                 const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
@@ -24,12 +23,10 @@ document.getElementById("getLocationOption").addEventListener("click", () => {
                 console.error("Reverse geocoding failed", err);
             }
 
-            // Guardar en dataset del botón
             submitBtn.dataset.lat = latitude;
             submitBtn.dataset.lon = longitude;
             submitBtn.dataset.address = address;
 
-            // Activar botón
             submitBtn.disabled = false;
         },
         () => {
@@ -38,7 +35,6 @@ document.getElementById("getLocationOption").addEventListener("click", () => {
     );
 });
 
-// Cuando se hace click en "Look Around"
 submitBtn.addEventListener("click", async () => {
     if (submitBtn.disabled) return;
 
@@ -46,9 +42,7 @@ submitBtn.addEventListener("click", async () => {
     const longitude = parseFloat(submitBtn.dataset.lon);
     const address = submitBtn.dataset.address;
 
-    // Aquí mandamos al backend para obtener la lista
     try {
-        // Por ejemplo a /api/search con POST
         const response = await fetch("/api/search", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -60,7 +54,6 @@ submitBtn.addEventListener("click", async () => {
         });
 
         const payload = await response.json();
-        // Llamamos a la función de tu compañero para mostrar la lista
         updateParkingList(payload);
 
     } catch (err) {

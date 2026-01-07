@@ -34,7 +34,6 @@ function getCurrentLocation(input) {
         async (position) => {
             const { latitude, longitude } = position.coords;
     
-            // Reverse geocoding
             let address = "Unknown location";
             try {
                 const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
@@ -46,7 +45,6 @@ function getCurrentLocation(input) {
                 input.value = "Unknown location";
             }
     
-            // Guardar los datos en el botón
             submitBtn.dataset.lat = latitude;
             submitBtn.dataset.lon = longitude;
             submitBtn.dataset.address = address;
@@ -78,38 +76,3 @@ function showError(error) {
             break;
     }
 }
-
-
-// --- SOLO PARA PRUEBAS SIN BACKEND ---
-document.addEventListener("DOMContentLoaded", () => {
-    const submitBtn = document.getElementById("submitBtn");
-
-    // Habilita el botón manualmente para simular que la geolocalización ya pasó
-    submitBtn.disabled = false;
-
-    submitBtn.addEventListener("click", () => {
-        if (submitBtn.disabled) return;
-
-        // Simular datos de parqueos
-        const fakePayload = [
-            {
-                name: "Parking Test 1",
-                adress: "123 Test St",
-                capacity: 10,
-                priceTotal: 5,
-                walkingTimeMinutes: 3
-            },
-            {
-                name: "Parking Test 2",
-                adress: "456 Example Ave",
-                capacity: 2,
-                priceTotal: 3,
-                walkingTimeMinutes: 5
-            }
-        ];
-
-        // Mostrar la lista como si viniera del backend
-        updateParkingList(fakePayload);
-    });
-});
-

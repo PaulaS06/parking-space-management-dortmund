@@ -86,7 +86,6 @@ async function searchParking() {
 
         const payload = await response.json();
 
-        // Llamar al JS de la lista
         updateParkingList(payload);
 
     } finally {
@@ -118,7 +117,7 @@ function handleApiError(status, payload) {
 
         case 404:
             showError("No free parking houses found. Please try again later.");
-            updateParkingList([]); // Liste leeren
+            updateParkingList([]); 
             break;
 
         case 502:
