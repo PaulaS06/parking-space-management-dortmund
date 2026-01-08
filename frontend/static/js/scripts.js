@@ -25,8 +25,14 @@
     const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
+    const voiceBtn = document.getElementById("voiceBtn");
+
     if (!SpeechRecognition) {
-        alert("SpeechRecognition wird von diesem Browser nicht unterstützt.");
+      console.warn("Speech recognition is not supported in this browser");
+      disableVoiceButton("Speech recognition is not supported in this browser");
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "de-DE";
     }
 
     const recognition = new SpeechRecognition();
@@ -44,8 +50,18 @@
 
     recognition.onerror = function (event) {
         console.error("Fehler:", event.error);
+        voiceBtn.disabled = true;
+        disableVoiceButton("Speech recognition is not supported in this browser");
     };
 
     function startSpeech() {
         recognition.start();
+    }
+
+    function disableVoiceButton(reason) {
+        const voiceBtn = document.getElementById("voiceBtn");
+
+        voiceBtn.disabled = true;
+        voiceBtn.classList.add("voice-error");
+        voiceBtn.title = reason;
     }

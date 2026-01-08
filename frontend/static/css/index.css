@@ -84,6 +84,23 @@ h1 {
     border-radius: 5px;
 }
 
+button.voice-error {
+  position: relative;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.voice-error::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -10%;
+  width: 120%;
+  height: 3px;
+  background-color: red;
+  transform: rotate(-20deg);
+}
+
 .submit-btn {
     width:224px;
     padding: 10px 20px;
