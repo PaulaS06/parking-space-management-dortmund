@@ -1,0 +1,72 @@
+[
+    {
+        "id": "107394",
+        "name": "St.-Johannes-Hospital",
+        "lat": 51.510727,
+        "lon": 7.456745,
+        "free_spots": 335
+    },
+    {
+        "id": "101052",
+        "name": "Friedensplatz",
+        "lat": 51.510227,
+        "lon": 7.46717,
+        "free_spots": 357
+    },
+    {
+        "id": "101057",
+        "name": "Hansaplatz / Karstadt",
+        "lat": 51.51304,
+        "lon": 7.4643874,
+        "free_spots": 517
+    },
+    {
+        "id": "101099",
+        "name": "Klinikum Dortmund",
+        "lat": 51.506905,
+        "lon": 7.4591284,
+        "free_spots": 382
+    },
+    {
+        "id": "553203",
+        "name": "P&R Schulte-Rödding",
+        "lat": 51.549355,
+        "lon": 7.489934399999955,
+        "free_spots": 535
+    },
+    {
+        "id": "553286",
+        "name": "P&R Hauptfriedhof",
+        "lat": 51.507725,
+        "lon": 7.533066,
+        "free_spots": 364
+    },
+    {
+        "id": "49249524",
+        "name": "Alte Post / NH Hotel",
+        "lat": 51.517475,
+        "lon": 7.462023700000044,
+        "free_spots": 177
+    },
+    {
+        "id": "101065",
+        "name": "Bissenkamp",
+        "lat": 51.515503,
+        "lon": 7.464931,
+        "free_spots": 144
+    },
+    {
+        "id": "101092",
+        "name": "Hauptbahnhof",
+        "lat": 51.51672,
+        "lon": 7.457335,
+        "free_spots": 492
+    },
+    {
+        "id": "103824",
+        "name": "Kuckelke",
+        "lat": 51.516224,
+        "lon": 7.46911,
+        "free_spots": 269
+    }
+]

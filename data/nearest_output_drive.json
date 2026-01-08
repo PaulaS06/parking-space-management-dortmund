@@ -1,0 +1,68 @@
+[
+    {
+        "name": "Klinikum Dortmund",
+        "fullAddress": null,
+        "latitude": 51.506905,
+        "longitude": 7.4591284,
+        "capacity": 392,
+        "evCharging": false,
+        "pricePerHour": 0.0,
+        "drivingTimeMinutes": 0.9,
+        "drivingDistanceInKm": 0.084
+    },
+    {
+        "name": "Rathaus / Stadtgarten",
+        "fullAddress": null,
+        "latitude": 51.511364,
+        "longitude": 7.463947300000025,
+        "capacity": 564,
+        "evCharging": false,
+        "pricePerHour": 0.0,
+        "drivingTimeMinutes": 3.47,
+        "drivingDistanceInKm": 1.372
+    },
+    {
+        "name": "Hansaplatz / Karstadt",
+        "fullAddress": "Hansaplatz 1, 44137 Dortmund, Germany",
+        "latitude": 51.51304,
+        "longitude": 7.4643874,
+        "capacity": 526,
+        "evCharging": true,
+        "pricePerHour": 3,
+        "drivingTimeMinutes": 3.73,
+        "drivingDistanceInKm": 1.509
+    },
+    {
+        "name": "St.-Johannes-Hospital",
+        "fullAddress": "Johannesstraße 9-17, 44137 Dortmund, Germany",
+        "latitude": 51.510727,
+        "longitude": 7.456745,
+        "capacity": 318,
+        "evCharging": true,
+        "pricePerHour": 3,
+        "drivingTimeMinutes": 6.05,
+        "drivingDistanceInKm": 1.606
+    },
+    {
+        "name": "Westentor",
+        "fullAddress": null,
+        "latitude": 51.515114,
+        "longitude": 7.456634,
+        "capacity": 308,
+        "evCharging": false,
+        "pricePerHour": 0.0,
+        "drivingTimeMinutes": 3.82,
+        "drivingDistanceInKm": 1.759
+    },
+    {
+        "name": "Friedensplatz",
+        "fullAddress": "Südwall 4, 44122 Dortmund, Germany",
+        "latitude": 51.510227,
+        "longitude": 7.46717,
+        "capacity": 381,
+        "evCharging": true,
+        "pricePerHour": 3,
+        "drivingTimeMinutes": 4.98,
+        "drivingDistanceInKm": 1.782
+    }
+]

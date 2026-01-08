@@ -3,16 +3,19 @@ import random
 from datetime import datetime
 import json 
 import os
+
 app = Flask(__name__)
 
 DATABASE = "database"
 os.makedirs(DATABASE, exist_ok=True)
+
 def save_json(data, filename):
     filepath = os.path.join(DATABASE, filename)
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
     print(f"JSON saved: {filepath}")
 
+# Sample parking data
 PARKINGS = [
     {"id": "101067", "full_address": "Burgwall 4, 44135 Dortmund, Germany"},
     {"id": "553286", "full_address": "Auf dem Steine 33, 44143 Dortmund, Germany"},
@@ -26,50 +29,25 @@ PARKINGS = [
     {"id": "553258", "full_address": "Joseph-Scherer-Straße 10, 44139 Dortmund, Germany"},
     {"id": "101070", "full_address": "Freistuhl 7, 44137 Dortmund, Germany"},
     {"id": "101073", "full_address": "Kampstraße 47, 44137 Dortmund, Germany"},
-    {"id": "101092", "full_address": "Königswall, 44137 Dortmund, Germany"},
-    {"id": "101059", "full_address": "Propsteihof 9, 44137 Dortmund, Germany"},
-    {"id": "101061", "full_address": "Parkdeck Kaufhof, Westenhellweg 72-84, 44137 Dortmund, Germany"},
-    {"id": "101099", "full_address": "Hohe Straße 33, 44139 Dortmund, Germany"},
-    {"id": "107380", "full_address": "Opernhaus Dortmund, Platz der Alten Synagoge 1, 44137 Dortmund, Germany"},
-    {"id": "49249524", "full_address": "NH Dortmund, Königswall 1, 44137 Dortmund, Germany"},
-    {"id": "101088", "full_address": "Robert-Schuman-Berufskolleg, Emil-Moog-Platz 15, 44137 Dortmund, Germany"},
-    {"id": "101063", "full_address": "zero, Westenhellweg 102-106, 44128 Dortmund, Germany"},
-    {"id": "553319", "full_address": "Dr.-Safiye-Ali-Straße 13, 44147 Dortmund, Germany"},
-    {"id": "101075", "full_address": "Schmiedingstraße 10, 44137 Dortmund, Germany"},
 ]
 
-def calculate_price(start_time, end_time):
-    try:
-        start_time = start_time.replace("Z", "")
-        end_time = end_time.replace("Z", "")
-        start_dt = datetime.fromisoformat(start_time)
-        end_dt = datetime.fromisoformat(end_time)
-        hours = (end_dt - start_dt).total_seconds() / 3600
-        price = round(hours * random.uniform(1, 3), 2)
-        return price
-    except:
-        return None
 
-@app.route("/api/v1/database", methods=["POST"])
-def get_parking_info_bulk():
-    data = request.json
-    save_json(data, "sent_from_backend")
 
-    
-    if not data or not isinstance(data, list):
-        return {"error": "JSON body must be a list of objects"}, 400
+# --- NEW GET endpoint for first endpoint ---
+@app.route("/api/v1/database/pricing-total", methods=["GET"])
+def get_parking_info_bulk_get():
+    start_time = request.args.get("start_time")
+    end_time = request.args.get("end_time")
+    ids_str = request.args.get("ids")
 
+    if not start_time or not end_time or not ids_str:
+        return {"error": "start_time, end_time and ids are required"}, 400
+
+    ids_list = ids_str.split(",")
     results = []
-    for item in data:
-        parking_id = item.get("id")
-        start_time = item.get("start_time")
-        end_time = item.get("end_time")
 
-        if not parking_id or not start_time or not end_time:
-            results.append({"id": parking_id, "error": "Missing start_time or end_time"})
-            continue
-
-        parking = next((p for p in PARKINGS if p["id"] == parking_id), None)
+    for parking_id in ids_list:
+        parking = next((p for p in PARKINGS if p["id"] == parking_id.strip()), None)
         if not parking:
             results.append({"id": parking_id, "error": "Parking not found"})
             continue
@@ -77,14 +55,16 @@ def get_parking_info_bulk():
         results.append({
             "id": parking_id,
             "fullAddress": parking["full_address"],
-            "evCharging": 'True', #random.choice([True, False]),
-            "priceTotal": calculate_price(start_time, end_time)
+            "evCharging": random.choice([True, False]), 
+            "priceTotal": 50
         })
-    
+
+    # Save for debugging
+    save_json({"start_time": start_time, "end_time": end_time, "ids": ids_list, "results": results}, "sent_from_backend_get.json")
+
     return jsonify(results)
 
 
 if __name__ == "__main__":
-    import os
     debug_mode = os.environ.get("DEBUG", "False").lower() == "true"
     app.run(host="0.0.0.0", port=5001, debug=debug_mode)

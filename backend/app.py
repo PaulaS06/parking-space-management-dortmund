@@ -161,34 +161,38 @@ import requests
 
 def enrich_parking_info(parkings, start_time, end_time):
     """
-    Receives list of parkings with id and send it to microservice to get
-    ev_charging, Total_price y full_address. Then updates each parking
-    of the list with that info.
+    GET request:
+    - start_time and end_time sent once
+    - ids sent as comma-separated list
     """
-    url = f"{DATABASE_SERVICE_URL}/api/v1/database"  #URL DATABASE MICROSERVICE
-    payload = [{"id": p["id"], "start_time": start_time, "end_time": end_time} for p in parkings]
+    url = f"{DATABASE_SERVICE_URL}/api/v1/database/pricing-total"
+
+    ids = ",".join(str(p["id"]) for p in parkings)
+
+    params = {
+        "start_time": start_time,
+        "end_time": end_time,
+        "ids": ids
+    }
 
     try:
-        resp = requests.post(url, json=payload, timeout=10)
+        resp = requests.get(url, params=params, timeout=10)
         resp.raise_for_status()
-        db_data = resp.json()  # List of dicts with id, ev_charging, Total_price, full_address
-        #save_json(db_data,"results_db")
-        # Create a dict fast to look for id
+        db_data = resp.json()
+
         db_dict = {item["id"]: item for item in db_data}
 
-        # Add microservice info to json file that already exists
         for p in parkings:
             info = db_dict.get(p["id"], {})
             p["evCharging"] = info.get("evCharging", False)
             p["priceTotal"] = info.get("priceTotal", 0.0)
-            p["fullAddress"] = info.get("fullAddress", p.get("fullAddress"))
+            p["fullAddress"] = info.get("fullAddress")
 
         return parkings
 
     except Exception as e:
         print("Error fetching parking info:", e)
-        print(f"Traceback: {traceback.format_exc()}")
-        # If it fails, returns original parkings with modification
+        print(traceback.format_exc())
         return parkings
 
 
@@ -208,8 +212,8 @@ def geoapify_routing_matrix(user_lat, user_lon, parkings, mode="walk"):
         
 
     }
-    print("Sources:", body["sources"])
-    print("Targets:", body["targets"])
+    #print("Sources:", body["sources"])
+    #print("Targets:", body["targets"])
 
     params = {"apiKey": GEOAPIFY_ROUTING_KEY}
 
@@ -302,8 +306,17 @@ def nearest_parking():
     user_lon = request.args.get("lon", type=float)
     start_str = request.args.get("start_time")
     end_str = request.args.get("end_time")
-    ev_charging = request.args.get("Ev_charging", type=bool)
     limit = request.args.get("limit", type=int, default=5)
+    ev_charging_str = request.args.get("Ev_charging")
+    if not ev_charging_str:
+        return {"error": "You should send a boolean value for Ev_charging"}, 400
+    ev_charging_str = ev_charging_str.lower()
+    if ev_charging_str == "true":
+        ev_charging = True
+    elif ev_charging_str == "false":
+        ev_charging = False
+    else:
+        return {"error": "Ev_charging must be 'true' or 'false'"}, 400
 
     if not start_str or not end_str:
         return {"error": "start_time and end_time are required"}, 400
@@ -315,8 +328,7 @@ def nearest_parking():
     if user_lat is None or user_lon is None:
         return {"error": "You should send coordinates or a valid address"}, 400
 
-    if ev_charging is None:
-        return {"error": "You should send a boolean value for Ev_charging"}, 400
+
     
     parkings = load_json("dortmund_parkings_processed.json")
     if not parkings:
@@ -344,6 +356,7 @@ def nearest_parking():
     save_json(available, "available_db")
     if ev_charging is True:
         available = [p for p in available if p.get("evCharging")]
+    
 
     for p in available:
         p["distance_haversine_km"] = round(haversine(user_lat, user_lon, p["lat"], p["lon"]), 3)
@@ -396,35 +409,33 @@ def nearest_parking():
 #Functions Second Endpoint
 def enrich_parking_info_second_endpoint(parkings):
     """
-    Receives list of parkings with id and send it to microservice to get
-    ev_charging, Total_price y full_address. Then updates each parking
-    of the list with that info.
+    GET request with ids only
     """
-    url = f"{DATABASE_SERVICE_URL}/api/v1/database_second_endpoint"  #URL DATABASE MICROSERVICE
-    payload = [{"id": p["id"]} for p in parkings]
+    url = f"{DATABASE_SERVICE_URL}/api/v1/database/pricing-hour"
+
+    ids = ",".join(str(p["id"]) for p in parkings)
+    params = {"ids": ids}
 
     try:
-        resp = requests.post(url, json=payload, timeout=10)
+        resp = requests.get(url, params=params, timeout=10)
         resp.raise_for_status()
-        db_data = resp.json()  # List of dicts with id, ev_charging, Total_price, full_address
-        save_json(db_data,"results_db")
-        # Create a dict fast to look for id
+        db_data = resp.json()
+
         db_dict = {item["id"]: item for item in db_data}
 
-        # Add microservice info to json file that already exists
         for p in parkings:
             info = db_dict.get(p["id"], {})
             p["evCharging"] = info.get("evCharging", False)
             p["pricePerHour"] = info.get("pricePerHour", 0.0)
-            p["fullAddress"] = info.get("fullAddress", p.get("fullAddress"))
+            p["fullAddress"] = info.get("fullAddress")
 
         return parkings
 
     except Exception as e:
         print("Error fetching parking info:", e)
-        print(f"Traceback: {traceback.format_exc()}")
-        # If it fails, returns original parkings with modification
+        print(traceback.format_exc())
         return parkings
+
     
 def geoapify_routing_matrix_second_endpoint(user_lat, user_lon, parkings, mode="drive"):
     url = "https://api.geoapify.com/v1/routematrix"
@@ -437,8 +448,8 @@ def geoapify_routing_matrix_second_endpoint(user_lat, user_lon, parkings, mode="
         
 
     }
-    print("Sources:", body["sources"])
-    print("Targets:", body["targets"])
+    #print("Sources:", body["sources"])
+    #print("Targets:", body["targets"])
 
     params = {"apiKey": GEOAPIFY_ROUTING_KEY}
 
@@ -469,8 +480,17 @@ def nearby_parking():
     #fetch_and_save_parking_data()
     user_lat = request.args.get("lat", type=float)
     user_lon = request.args.get("lon", type=float)
-    ev_charging = request.args.get("Ev_charging", type=bool)
     limit = request.args.get("limit",type=int, default=5)
+    ev_charging_str = request.args.get("Ev_charging")
+    if not ev_charging_str:
+        return {"error": "You should send a boolean value for Ev_charging"}, 400
+    ev_charging_str = ev_charging_str.lower()
+    if ev_charging_str == "true":
+        ev_charging = True
+    elif ev_charging_str == "false":
+        ev_charging = False
+    else:
+        return {"error": "Ev_charging must be 'true' or 'false'"}, 400
 
 
     if user_lat is None or user_lon is None:
