@@ -17,8 +17,13 @@
         // Endzeit = Startzeit + 2 Stunden
         const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
         // In HH:MM für <input type="time">
-        document.getElementById("startTime").value = pad(start.getHours()) + ':' + pad(start.getMinutes());
-        document.getElementById("endTime").value = pad(end.getHours()) + ':' + pad(end.getMinutes());
+        const startTimeInput = document.getElementById("startTime");
+        const endTimeInput = document.getElementById("endTime");
+        if(!startTimeInput || !endTimeInput){
+            return;
+        }
+        startTimeInput.value = pad(start.getHours()) + ':' + pad(start.getMinutes());
+        endTimeInput.value = pad(end.getHours()) + ':' + pad(end.getMinutes());
     };
 
     // Browser Speech API
