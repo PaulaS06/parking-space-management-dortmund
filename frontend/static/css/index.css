@@ -113,11 +113,11 @@ button.voice-error::after {
     border:none;
 }
 .submit-btn:active {
-  background-color: #b9a30d;
+    background-color: #b9a30d;
 }
 .submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 .header {
     display: flex;
@@ -174,20 +174,20 @@ button.voice-error::after {
     margin-right: 8px;
 }
 #suggestions {
-  list-style: none;
-  padding: 0;
-  margin-top: 5px;
-  width: 300px;
+    list-style: none;
+    padding: 0;
+    margin-top: 5px;
+    width: 300px;
 }
 
 #suggestions li {
-  padding: 6px;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
+    padding: 6px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
 }
 
 #suggestions li:hover {
-  background: #f0f0f0;
+    background: #f0f0f0;
 }
 
 .modal-btn {
@@ -200,7 +200,7 @@ button.voice-error::after {
 }
 
 .modal-btn:active {
-  background-color: #b9a30d;
+    background-color: #b9a30d;
 }
 
 .result-list {

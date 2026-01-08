@@ -25,7 +25,7 @@ def home():
 
 @app.route('/nearby')
 def nearby():
-    return render_template('window1.html')
+    return render_template('nearby.html')
 
 @app.route("/autocomplete")
 def autocomplete():
