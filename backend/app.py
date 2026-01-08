@@ -301,7 +301,7 @@ def parking_is_available(parking, start_dt, end_dt):
 # ---------------------------------------------------------
 @app.route("/api/v1/parkinghouses/walking", methods=["GET"])
 def nearest_parking():
-    fetch_and_save_parking_data()
+    #fetch_and_save_parking_data()
     user_lat = request.args.get("lat", type=float)
     user_lon = request.args.get("lon", type=float)
     start_str = request.args.get("start_time")
@@ -309,7 +309,7 @@ def nearest_parking():
     limit = request.args.get("limit", type=int, default=5)
     ev_charging_str = request.args.get("Ev_charging")
     if not ev_charging_str:
-        return {"error": "You should send a boolean value for Ev_charging"}, 400
+        return {"error": "You should send a value for Ev_charging"}, 400
     ev_charging_str = ev_charging_str.lower()
     if ev_charging_str == "true":
         ev_charging = True
@@ -330,9 +330,8 @@ def nearest_parking():
 
 
     
-    parkings = load_json("dortmund_parkings_processed.json")
-    if not parkings:
-        parkings = fetch_and_save_parking_data()
+    parkings = get_parking_data()
+    
 
     available = []
     for p in parkings:
@@ -483,7 +482,7 @@ def nearby_parking():
     limit = request.args.get("limit",type=int, default=5)
     ev_charging_str = request.args.get("Ev_charging")
     if not ev_charging_str:
-        return {"error": "You should send a boolean value for Ev_charging"}, 400
+        return {"error": "You should send a value for Ev_charging"}, 400
     ev_charging_str = ev_charging_str.lower()
     if ev_charging_str == "true":
         ev_charging = True
