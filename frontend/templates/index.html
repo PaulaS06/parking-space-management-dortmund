@@ -12,7 +12,10 @@
         <button class="filter-button" data-bs-toggle="modal" data-bs-target="#filterModal">
             <i class="fas fa-sliders-h"></i>
         </button>
-        <input id="search" type="text" placeholder="Search Parking Location">
+        <div class="search-container">
+            <input id="search" type="text" placeholder="Search Parking Location">
+            <button type="button" class="mic-button" onclick="startSpeech()"><img src="static/images/microphone.png" alt="logo" class="mic-img"></button>
+        </div>
         <ul id="suggestions"></ul>
         <div class="row g-3 justify-content-center time-div">
             <div class="col-md-6 time-input">
