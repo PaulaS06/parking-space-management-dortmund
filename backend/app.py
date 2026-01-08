@@ -3,6 +3,7 @@ import requests
 import math
 import json
 import os
+import traceback
 from datetime import datetime, time
 from collections import OrderedDict
 app = Flask(__name__)
@@ -12,6 +13,7 @@ app = Flask(__name__)
 # -------------------------------
 DORTMUND_URL = "https://open-data.dortmund.de/api/explore/v2.1/catalog/datasets/parkhauser/records"
 GEOAPIFY_ROUTING_KEY = "9a49c37eba2c4a87ac26e3610becac2b"
+DATABASE_SERVICE_URL = os.environ.get("DATABASE_SERVICE_URL", "http://localhost:5001")
 
 #-------------------------------
 # Function to get parking data
@@ -142,6 +144,7 @@ def fetch_and_save_parking_data():
 
         except Exception as e:
             print(f"Error fetching data: {e}")
+            print(f"Traceback: {traceback.format_exc()}")
             break
 
     # Save raw data
@@ -162,7 +165,7 @@ def enrich_parking_info(parkings, start_time, end_time):
     ev_charging, Total_price y full_address. Then updates each parking
     of the list with that info.
     """
-    url = "http://localhost:5001/api/v1/database"  #URL DATABASE MICROSERVICE
+    url = f"{DATABASE_SERVICE_URL}/api/v1/database"  #URL DATABASE MICROSERVICE
     payload = [{"id": p["id"], "start_time": start_time, "end_time": end_time} for p in parkings]
 
     try:
@@ -184,6 +187,7 @@ def enrich_parking_info(parkings, start_time, end_time):
 
     except Exception as e:
         print("Error fetching parking info:", e)
+        print(f"Traceback: {traceback.format_exc()}")
         # If it fails, returns original parkings with modification
         return parkings
 
@@ -226,6 +230,7 @@ def geoapify_routing_matrix(user_lat, user_lon, parkings, mode="walk"):
 
     except Exception as e:
         print("Routing matrix error:", e)
+        print(f"Traceback: {traceback.format_exc()}")
         return None, None
 
 
@@ -395,7 +400,7 @@ def enrich_parking_info_second_endpoint(parkings):
     ev_charging, Total_price y full_address. Then updates each parking
     of the list with that info.
     """
-    url = "http://localhost:5001/api/v1/database_second_endpoint"  #URL DATABASE MICROSERVICE
+    url = f"{DATABASE_SERVICE_URL}/api/v1/database_second_endpoint"  #URL DATABASE MICROSERVICE
     payload = [{"id": p["id"]} for p in parkings]
 
     try:
@@ -417,6 +422,7 @@ def enrich_parking_info_second_endpoint(parkings):
 
     except Exception as e:
         print("Error fetching parking info:", e)
+        print(f"Traceback: {traceback.format_exc()}")
         # If it fails, returns original parkings with modification
         return parkings
     
@@ -453,6 +459,7 @@ def geoapify_routing_matrix_second_endpoint(user_lat, user_lon, parkings, mode="
 
     except Exception as e:
         print("Routing matrix error:", e)
+        print(f"Traceback: {traceback.format_exc()}")
         return None, None
 
 ############################

@@ -114,6 +114,7 @@ def api_search():
         longitude=longitude,
         start_time=start_time,
         end_time=end_time,
+        ev_charging=ev_filter,
         limit=5
     )
 

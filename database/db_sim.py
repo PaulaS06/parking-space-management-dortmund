@@ -85,4 +85,6 @@ def get_parking_info_bulk():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    import os
+    debug_mode = os.environ.get("DEBUG", "False").lower() == "true"
+    app.run(host="0.0.0.0", port=5001, debug=debug_mode)

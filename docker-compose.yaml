@@ -1,22 +1,23 @@
 services:
-  # 1. The Database (SQLite volume container)
-  db:
-    image: alpine:latest
-    command: tail -f /dev/null
+  # 1. Database Microservice
+  database:
+    build: ./database
+    ports:
+      - "5001:5001"
     volumes:
-      - db_data:/data
+      - database_data:/app/database
+    environment:
+      DEBUG: "false"
 
   # 2. The Backend (API)
   backend:
     build: ./backend
     ports:
       - "8000:8000"
-    volumes:
-      - db_data:/data
     depends_on:
-      - db
+      - database
     environment:
-      DATABASE_URL: sqlite:///data/app.db
+      DATABASE_SERVICE_URL: http://database:5001
       # DEBUG: "true"  # Uncomment to enable debug mode (NOT recommended for production)
 
   # 3. The Frontend (UI)
@@ -24,8 +25,11 @@ services:
       build: ./frontend
       ports:
         - "3000:3000"
+      depends_on:
+        - backend
       environment:
         - BACKEND_URL=http://backend:8000
 
 volumes:
   db_data:
+  database_data:

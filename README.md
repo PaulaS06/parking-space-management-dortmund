@@ -13,9 +13,28 @@ You can run the application in two modes:
 ```bash
 docker compose up --build
 ```
-
+Note: make sure docker desktop is running
 **Option B: Detached Mode (Background)**
 ```bash
+docker compose up --build -d
+```
+
+**Viewing Logs**
+
+View logs for all containers:
+```bash
+docker compose logs -f
+```
+
+View logs for a specific container:
+```bash
+docker compose logs -f <container_name>
+```
+
+List available containers:
+```bash
+docker compose ps
+```
 docker compose up --build -d
 ```
 
