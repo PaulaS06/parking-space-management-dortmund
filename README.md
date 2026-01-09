@@ -35,8 +35,7 @@ List available containers:
 ```bash
 docker compose ps
 ```
-docker compose up --build -d
-```
+
 
 ### Stopping the Application
 ```bash

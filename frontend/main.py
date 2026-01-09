@@ -80,64 +80,22 @@ def api_filter():
 
 @app.route("/api/search")
 def api_search():
-    ev_filter = session.get('ev_filter', False)
+    if "lat" not in session or "lon" not in session:
+        return jsonify({"error": "location not set"}), 400
 
-    # Get parameters from session first, then from request
-    latitude = session.get('lat') or request.args.get('lat', type=float)
-    longitude = session.get('lon') or request.args.get('lon', type=float)
-    address = request.args.get('address')
-    start_time_str = session.get('start_time') or request.args.get('start_time')
-    end_time_str = session.get('end_time') or request.args.get('end_time')
-    
-    # If no coordinates provided but address is, we need to geocode
-    # For now, use default Dortmund coordinates if nothing provided
-    if latitude is None or longitude is None:
-        if address:
-            # Try to geocode the address
-            try:
-                geocode_url = f"https://api.geoapify.com/v1/geocode/search?text={address}&apiKey={GEOAPIFY_API_KEY}"
-                geocode_response = requests.get(geocode_url)
-                geocode_data = geocode_response.json()
-                if geocode_data.get("features"):
-                    coords = geocode_data["features"][0]["geometry"]["coordinates"]
-                    longitude = coords[0]
-                    latitude = coords[1]
-                else:
-                    return jsonify({"error": "Could not find location"}), 400
-            except Exception as e:
-                return jsonify({"error": f"Geocoding failed: {str(e)}"}), 500
-        else:
-            # Default to Dortmund city center
-            latitude = 51.5136
-            longitude = 7.4653
-    
-    # Parse time inputs - they come as HH:MM format or ISO format from session, convert to datetime
-    try:
-        if start_time_str and end_time_str:
-            # Check if it's already a datetime string (from session)
-            if isinstance(start_time_str, str) and 'T' in start_time_str:
-                # It's already ISO format from session
-                start_time = datetime.fromisoformat(start_time_str)
-                end_time = datetime.fromisoformat(end_time_str)
-            else:
-                # Get today's date and combine with the time (HH:MM format from request)
-                today = datetime.now().date()
-                start_time = datetime.strptime(start_time_str, "%H:%M").replace(
-                    year=today.year, month=today.month, day=today.day
-                )
-                end_time = datetime.strptime(end_time_str, "%H:%M").replace(
-                    year=today.year, month=today.month, day=today.day
-                )
-        else:
-            # Default to now + 2 hours
-            start_time = datetime.now()
-            end_time = datetime.now() + timedelta(hours=2)
-    except (ValueError, TypeError) as e:
-        return jsonify({"error": f"Invalid time format: {str(e)}"}), 400
-    
+    ev_filter = session.get('ev_filter', False)
+    lat = session.get('lat')
+    lon = session.get('lon')
+    start_time_str = session.get('start_time')
+    end_time_str = session.get('end_time')
+
+    # Convert ISO strings back to datetime objects
+    start_time = datetime.fromisoformat(start_time_str) if start_time_str else None
+    end_time = datetime.fromisoformat(end_time_str) if end_time_str else None
+
     request_dto = ParkingRequestDto(
-        latitude=latitude,
-        longitude=longitude,
+        latitude=lat,
+        longitude=lon,
         start_time=start_time,
         end_time=end_time,
         ev_charging=ev_filter,
@@ -168,7 +126,8 @@ def api_search():
         return jsonify({"error": str(e)}), 502  # Bad Gateway
 
     except Exception as e:
-        return jsonify({"error": "Unexpected error"}), 500
+        app.logger.error(f"Unexpected error in /api/search: {str(e)}", exc_info=True)
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
 @app.route("/set_time", methods=["POST"])
 def set_time():

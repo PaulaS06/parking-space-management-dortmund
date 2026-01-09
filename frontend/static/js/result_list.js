@@ -16,7 +16,7 @@ function applyFilter() {
                 .catch(() => {
                         // Keep UI responsive even if filter refresh fails
                         console.warn("Failed to refresh filtered results");
-                });
+    });
 
     closeModal();
 }
