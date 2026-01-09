@@ -8,12 +8,15 @@ function closeModal() {
 
 function applyFilter() {
     let checkbox = document.getElementById("evChargingCheckbox");
-    let ev = checkbox.checked ? "true" : "false";
-
-    // AJAX-Call
-    fetch(`/api/filter?ev_charging=${ev}`)
-        .then(response => response.json())
-        .then(data => updateParkingList(data));
+        // Use API route that both sets the filter and returns updated results
+        const ev = checkbox.checked ? "true" : "false";
+        fetch(`/api/filter?ev_charging=${ev}`)
+                .then(response => response.json())
+                .then(data => updateParkingList(data))
+                .catch(() => {
+                        // Keep UI responsive even if filter refresh fails
+                        console.warn("Failed to refresh filtered results");
+                });
 
     closeModal();
 }
@@ -22,9 +25,21 @@ function updateParkingList(list) {
     let container = document.getElementById("parkingList");
     container.innerHTML = "";
 
+    if (!list || list.length === 0) {
+        container.innerHTML = `
+            <div class="text-muted text-center mt-3">
+                Keine Parkplätze verfügbar.
+            </div>`;
+        return;
+    }
+
     list.forEach(item => {
         const card = document.createElement("div");
         card.className = "card mb-1";
+        card.addEventListener("click", () => {
+            sessionStorage.setItem("selectedParking", JSON.stringify(item));
+            window.location.href = "/details";
+        });
 
         card.innerHTML = `
         <div class="card-body">
@@ -68,50 +83,93 @@ function updateParkingList(list) {
 }
 
 
-function searchParking() {
-    // Get search parameters
-    const address = document.getElementById("search").value;
-    const startTime = document.getElementById("startTime").value;
-    const endTime = document.getElementById("endTime").value;
-    
-    // Get coordinates if set by autocomplete
-    const lat = window.selectedLat;
-    const lon = window.selectedLon;
-    
-    if (!address && !lat) {
-        alert("Please enter a location to search");
-        return;
-    }
-    
-    if (!startTime || !endTime) {
-        alert("Please select start and end times");
-        return;
-    }
-    
-    // Build query parameters
-    let params = new URLSearchParams();
-    if (lat && lon) {
-        params.append('lat', lat);
-        params.append('lon', lon);
-    } else if (address) {
-        params.append('address', address);
-    }
-    params.append('start_time', startTime);
-    params.append('end_time', endTime);
-    
-    // AJAX-Call
-    fetch(`/api/search?${params.toString()}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert("Error: " + data.error);
-            } else {
-                updateParkingList(data);
-            }
-        })
-        .catch(error => {
-            console.error("Search error:", error);
-            alert("Failed to search parking. Please try again.");
+async function searchParking() {
+    clearError();
+    showLoading();
+    try{
+        const startTime = document.getElementById("startTime").value; // "HH:MM"
+        const endTime = document.getElementById("endTime").value;
+
+        console.log(startTime, endTime);
+        const response = await fetch("/set_time", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                start_time: startTime,
+                end_time: endTime
+            })
         });
+
+        if (!response.ok) {
+            console.error("Fehler beim Setzen der Zeit");
+            return;
+        }
+        const apiResponse = await fetch("/api/search");
+
+        let payload = null;
+        try {
+            payload = await apiResponse.json();
+        } catch {
+            showError("Ungültige Serverantwort.");
+            return;
+        }
+
+        if (!apiResponse.ok) {
+            handleApiError(apiResponse.status, payload);
+            return;
+        }
+        updateParkingList(payload);
+    } finally {
+        hideLoading();
+    }
 }
 
+function showError(message) {
+    const box = document.getElementById("errorBox");
+    box.textContent = message;
+    box.classList.remove("d-none");
+}
+
+function clearError() {
+    const box = document.getElementById("errorBox");
+    box.textContent = "";
+    box.classList.add("d-none");
+}
+
+function handleApiError(status, payload) {
+    switch (status) {
+        case 400:
+            showError("Server error. Please try again later.");
+            break;
+
+        case 401:
+            showError("Server error. Please try again later.");
+            break;
+
+        case 404:
+            showError("No free parking houses found. Please try again later.");
+            updateParkingList([]); // Liste leeren
+            break;
+
+        case 502:
+            showError("Server not reachable. Please try again later.");
+            break;
+
+        case 500:
+            showError("Server error. Please try again later.");
+            break;
+
+        default:
+            showError("Unknown Error. Please try again later.");
+    }
+}
+
+function showLoading() {
+    document.getElementById("loadingOverlay").classList.remove("d-none");
+}
+
+function hideLoading() {
+    document.getElementById("loadingOverlay").classList.add("d-none");
+}

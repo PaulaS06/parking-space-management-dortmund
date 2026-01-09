@@ -1,44 +1,65 @@
-// Capturar ubicación del dispositivo
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
-    } else {
-        alert("Geolocation is not supported by this browser.");
+document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("location_input");
+    const dropdown = document.getElementById("locationDropdown");
+    const getLocationOption = document.getElementById("getLocationOption");
+
+    // Mostrar dropdown al hacer focus
+    input.addEventListener("focus", () => {
+        dropdown.classList.remove("d-none");
+    });
+
+    // Ocultar si se hace click fuera
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".location")) {
+            dropdown.classList.add("d-none");
+        }
+    });
+
+    // Click en "Get current location"
+    getLocationOption.addEventListener("click", () => {
+        dropdown.classList.add("d-none");
+        getCurrentLocation(input);
+    });
+});
+
+
+// ---- GEOLOCATION ----
+function getCurrentLocation(input) {
+    if (!navigator.geolocation) {
+        alert("Geolocation not supported");
+        return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+                .then(res => res.json())
+                .then(data => {
+                    input.value = data.display_name || "Unknown location";
+                });
+        },
+        () => {
+            alert("Unable to retrieve location");
+        }
+    );
 }
 
-// Mostrar la posición en el label
-function showPosition(position) {
-    const lat = position.coords.latitude;
-    const lon = position.coords.longitude;
-
-    // Usar un servicio de geocodificación (ejemplo con OpenStreetMap)
-    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
-        .then(response => response.json())
-        .then(data => {
-            const address = data.display_name || "Ubicación desconocida";
-            document.getElementById("location-label").innerText = address;
-        })
-        .catch(error => console.error("Error al obtener la dirección:", error));
-}
-
-// Manejar errores de geolocalización
+// Handle geolocation errors
 function showError(error) {
     switch (error.code) {
         case error.PERMISSION_DENIED:
-            alert("El usuario denegó la solicitud de geolocalización.");
+            alert("User denied the request for Geolocation.");
             break;
         case error.POSITION_UNAVAILABLE:
-            alert("La información de ubicación no está disponible.");
+            alert("Location information is unavailable.");
             break;
         case error.TIMEOUT:
-            alert("La solicitud para obtener la ubicación ha caducado.");
+            alert("The request to get user location timed out.");
             break;
         case error.UNKNOWN_ERROR:
-            alert("Se produjo un error desconocido.");
+            alert("An unknown error occurred.");
             break;
     }
 }
-
-// Llamar a la función al cargar la página
-window.onload = getLocation;

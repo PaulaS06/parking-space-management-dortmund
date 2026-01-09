@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, jsonify, session
 from flask_session import Session
-from DataTransferObjects import ParkingRequestDto, ParkingRecommendationDto
+from DataTransferObjects import ParkingRequestDto
 from BackendRestClient import BackendRestClient
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
+from Exceptions import BackendServerError, InvalidParameterError, NoResultsError, AuthFailedError
 import requests
 import os
 
@@ -15,7 +16,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=5)
 
 # Use environment variable for backend URL, default to Docker service name
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")
-backend_client = BackendRestClient(base_url=BACKEND_URL)
+backend_client = BackendRestClient(base_url=BACKEND_URL, username="admin", password="admin")
 
 # Initialize Flask-Session
 Session(app)
@@ -27,7 +28,7 @@ def home():
 
 @app.route('/nearby')
 def nearby():
-    return render_template('window1.html')
+    return render_template('nearby.html')
 
 @app.route("/autocomplete")
 def autocomplete():
@@ -49,6 +50,25 @@ def autocomplete():
 
     return jsonify(data.get("features", []))
 
+@app.route("/set_filter", methods=["POST"])
+def set_filter():
+    data = request.get_json()
+    session['ev_filter'] = eval(data['ev_charging'])
+    return {"status": "ok"}
+
+@app.route("/set_location", methods=["POST"])
+def set_location():
+    data = request.get_json()
+
+    session["lat"] = data["lat"]
+    session["lon"] = data["lon"]
+
+    return jsonify({"status": "ok"})
+
+@app.route("/details")
+def details():
+    return render_template('details.html')
+
 @app.route("/api/filter")
 def api_filter():
     # Store the EV filter preference in session
@@ -62,12 +82,12 @@ def api_filter():
 def api_search():
     ev_filter = session.get('ev_filter', False)
 
-    # Get parameters from request
+    # Get parameters from session first, then from request
+    latitude = session.get('lat') or request.args.get('lat', type=float)
+    longitude = session.get('lon') or request.args.get('lon', type=float)
     address = request.args.get('address')
-    latitude = request.args.get('lat', type=float)
-    longitude = request.args.get('lon', type=float)
-    start_time_str = request.args.get('start_time')
-    end_time_str = request.args.get('end_time')
+    start_time_str = session.get('start_time') or request.args.get('start_time')
+    end_time_str = session.get('end_time') or request.args.get('end_time')
     
     # If no coordinates provided but address is, we need to geocode
     # For now, use default Dortmund coordinates if nothing provided
@@ -91,22 +111,28 @@ def api_search():
             latitude = 51.5136
             longitude = 7.4653
     
-    # Parse time inputs - they come as HH:MM format, convert to datetime
+    # Parse time inputs - they come as HH:MM format or ISO format from session, convert to datetime
     try:
         if start_time_str and end_time_str:
-            # Get today's date and combine with the time
-            today = datetime.now().date()
-            start_time = datetime.strptime(start_time_str, "%H:%M").replace(
-                year=today.year, month=today.month, day=today.day
-            )
-            end_time = datetime.strptime(end_time_str, "%H:%M").replace(
-                year=today.year, month=today.month, day=today.day
-            )
+            # Check if it's already a datetime string (from session)
+            if isinstance(start_time_str, str) and 'T' in start_time_str:
+                # It's already ISO format from session
+                start_time = datetime.fromisoformat(start_time_str)
+                end_time = datetime.fromisoformat(end_time_str)
+            else:
+                # Get today's date and combine with the time (HH:MM format from request)
+                today = datetime.now().date()
+                start_time = datetime.strptime(start_time_str, "%H:%M").replace(
+                    year=today.year, month=today.month, day=today.day
+                )
+                end_time = datetime.strptime(end_time_str, "%H:%M").replace(
+                    year=today.year, month=today.month, day=today.day
+                )
         else:
             # Default to now + 2 hours
             start_time = datetime.now()
             end_time = datetime.now() + timedelta(hours=2)
-    except ValueError as e:
+    except (ValueError, TypeError) as e:
         return jsonify({"error": f"Invalid time format: {str(e)}"}), 400
     
     request_dto = ParkingRequestDto(
@@ -126,8 +152,50 @@ def api_search():
 
         return jsonify([r.__dict__ for r in results])
 
+    except InvalidParameterError as e:
+        return jsonify({"error": str(e)}), 400
+
+    except AuthFailedError as e:
+        return jsonify({"error": str(e)}), 401
+
+    except NoResultsError as e:
+        return jsonify({
+            "error": str(e),
+            "results": []
+        }), 404
+
+    except BackendServerError as e:
+        return jsonify({"error": str(e)}), 502  # Bad Gateway
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Unexpected error"}), 500
+
+@app.route("/set_time", methods=["POST"])
+def set_time():
+    data = request.get_json()
+
+    start_time_str = data["start_time"]
+    end_time_str = data["end_time"]
+
+    today = date.today()
+
+    start_dt = datetime.combine(
+        today,
+        datetime.strptime(start_time_str, "%H:%M").time()
+    )
+
+    end_dt = datetime.combine(
+        today,
+        datetime.strptime(end_time_str, "%H:%M").time()
+    )
+
+    if end_dt <= start_dt:
+        end_dt = end_dt.replace(day=end_dt.day + 1)
+
+    session["start_time"] = start_dt.isoformat()
+    session["end_time"] = end_dt.isoformat()
+
+    return {"status": "ok"}
 
 if __name__ == '__main__':
     # Only enable debug mode if DEBUG environment variable is set
