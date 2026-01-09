@@ -18,7 +18,7 @@ class ParkingRequestDto:
             "lng": self.longitude,
             "start_time": self.start_time,
             "end_time": self.end_time,
-            "ev_charging": self.ev_charging,
+            "Ev_charging": self.ev_charging,
             "limit": self.limit
         }
 
