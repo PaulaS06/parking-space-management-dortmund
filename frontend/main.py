@@ -7,7 +7,7 @@ from Exceptions import BackendServerError, InvalidParameterError, NoResultsError
 import requests
 import os
 
-GEOAPIFY_API_KEY = "e2a0ea3f5d5e4efd819ad7345c90e18b"
+GEOAPIFY_API_KEY = os.environ.get("GEOAPIFY_API_KEY")
 
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False     # Sessions expire when the browser is closed
@@ -15,9 +15,11 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=5)
 
 # Use environment variable for backend URL, default to Docker service name
-# BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
-backend_client = BackendRestClient(base_url=BACKEND_URL, username="admin", password="admin")
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")
+# BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
+username = os.environ.get("BACKEND_USERNAME", "admin")
+password = os.environ.get("BACKEND_PW", "admin")
+backend_client = BackendRestClient(base_url=BACKEND_URL, username=username, password=password)
 
 # Initialize Flask-Session
 Session(app)
