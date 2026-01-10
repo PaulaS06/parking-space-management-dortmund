@@ -24,6 +24,19 @@
         }
         startTimeInput.value = pad(start.getHours()) + ':' + pad(start.getMinutes());
         endTimeInput.value = pad(end.getHours()) + ':' + pad(end.getMinutes());
+
+        fetch("/get_address")
+        .then(r => r.json())
+        .then(data => {
+          if (data.address) {
+              document.getElementById("search").value = data.address;
+          }
+          if (data.lat && data.lon) {
+              document.getElementById("submitBtn").disabled = false;
+          } else{
+              document.getElementById("submitBtn").disabled = true;
+          }
+        });
     };
 
     // Browser Speech API

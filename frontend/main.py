@@ -15,7 +15,8 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=5)
 
 # Use environment variable for backend URL, default to Docker service name
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")
+# BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
 backend_client = BackendRestClient(base_url=BACKEND_URL, username="admin", password="admin")
 
 # Initialize Flask-Session
@@ -62,8 +63,13 @@ def set_location():
 
     session["lat"] = data["lat"]
     session["lon"] = data["lon"]
+    session["address"] = data["address"]
 
     return jsonify({"status": "ok"})
+
+@app.route("/get_address")
+def get_address():
+    return {"address": session.get("address"), "lat": session.get("lat"), "lon": session.get("lon")}
 
 @app.route("/details")
 def details():

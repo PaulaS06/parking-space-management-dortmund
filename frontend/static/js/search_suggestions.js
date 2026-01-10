@@ -32,6 +32,7 @@ document.getElementById("search").addEventListener("input", function () {
 
             const lat = item.properties.lat;
             const lon = item.properties.lon;
+            const address = item.properties.formatted;
             console.log("Koordinaten:", lat, lon);
             fetch("/set_location", {
                 method: "POST",
@@ -40,7 +41,8 @@ document.getElementById("search").addEventListener("input", function () {
                 },
                 body: JSON.stringify({
                   lat: lat,
-                  lon: lon
+                  lon: lon,
+                  address: address
                 })
               })
               .then(res => {
