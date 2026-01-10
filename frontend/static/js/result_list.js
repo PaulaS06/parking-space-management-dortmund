@@ -8,14 +8,23 @@ function closeModal() {
 
 function applyFilter() {
     let checkbox = document.getElementById("evChargingCheckbox");
-        // Use API route that both sets the filter and returns updated results
-        const ev = checkbox.checked ? "true" : "false";
-        fetch(`/api/filter?ev_charging=${ev}`)
-                .then(response => response.json())
-                .then(data => updateParkingList(data))
-                .catch(() => {
-                        // Keep UI responsive even if filter refresh fails
-                        console.warn("Failed to refresh filtered results");
+    // Set filter then update results
+    const ev = checkbox.checked;
+
+    fetch("/set_filter", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            ev_charging: ev
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "ok") {
+            searchParking();
+        }
     });
 
     closeModal();
@@ -28,7 +37,7 @@ function updateParkingList(list) {
     if (!list || list.length === 0) {
         container.innerHTML = `
             <div class="text-muted text-center mt-3">
-                Keine Parkplätze verfügbar.
+                No parking spots available.
             </div>`;
         return;
     }
@@ -151,6 +160,10 @@ function handleApiError(status, payload) {
         case 404:
             showError("No free parking houses found. Please try again later.");
             updateParkingList([]); // Liste leeren
+            break;
+        case 406:
+            // no location was set in the session -> show no error
+            console.log("no location set. Do not fetch backend.");
             break;
 
         case 502:

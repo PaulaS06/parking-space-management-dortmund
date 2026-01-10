@@ -53,7 +53,7 @@ def autocomplete():
 @app.route("/set_filter", methods=["POST"])
 def set_filter():
     data = request.get_json()
-    session['ev_filter'] = eval(data['ev_charging'])
+    session['ev_filter'] = bool(data['ev_charging'])
     return {"status": "ok"}
 
 @app.route("/set_location", methods=["POST"])
@@ -69,19 +69,10 @@ def set_location():
 def details():
     return render_template('details.html')
 
-@app.route("/api/filter")
-def api_filter():
-    # Store the EV filter preference in session
-    session['ev_filter'] = request.args.get("ev_charging") == "true"
-    
-    # Return the current search results with the filter applied
-    # This will re-run the search with the filter
-    return api_search()
-
 @app.route("/api/search")
 def api_search():
     if "lat" not in session or "lon" not in session:
-        return jsonify({"error": "location not set"}), 400
+        return jsonify({"error": "location not set"}), 406
 
     ev_filter = session.get('ev_filter', False)
     lat = session.get('lat')
