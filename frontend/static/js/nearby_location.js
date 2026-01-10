@@ -1,29 +1,36 @@
+// document.addEventListener("DOMContentLoaded", () => {
+//     const input = document.getElementById("location_input");
+//     // const dropdown = document.getElementById("locationDropdown");
+//     const getLocationOption = document.getElementById("getLocationOption");
+
+//     // Mostrar dropdown al hacer focus
+//     input.addEventListener("focus", () => {
+//         dropdown.classList.remove("d-none");
+//     });
+
+//     // Ocultar si se hace click fuera
+//     document.addEventListener("click", (e) => {
+//         if (!e.target.closest(".location")) {
+//             dropdown.classList.add("d-none");
+//         }
+//     });
+
+//     // Click en "Get current location"
+//     getLocationOption.addEventListener("click", () => {
+//         dropdown.classList.add("d-none");
+//         getCurrentLocation(input);
+//     });
+// });
+
+
 document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("location_input");
-    const dropdown = document.getElementById("locationDropdown");
-    const getLocationOption = document.getElementById("getLocationOption");
 
-    // Mostrar dropdown al hacer focus
-    input.addEventListener("focus", () => {
-        dropdown.classList.remove("d-none");
-    });
-
-    // Ocultar si se hace click fuera
-    document.addEventListener("click", (e) => {
-        if (!e.target.closest(".location")) {
-            dropdown.classList.add("d-none");
-        }
-    });
-
-    // Click en "Get current location"
-    getLocationOption.addEventListener("click", () => {
-        dropdown.classList.add("d-none");
-        getCurrentLocation(input);
-    });
+    getCurrentLocation(input);
 });
 
 function getCurrentLocation(input) {
-    const submitBtn = document.getElementById("submitBtn");
+    // const submitBtn = document.getElementById("submitBtn");
     
     if (!navigator.geolocation) {
         alert("Geolocation not supported");
@@ -45,21 +52,25 @@ function getCurrentLocation(input) {
                 input.value = "Unknown location";
             }
     
-            submitBtn.dataset.lat = latitude;
-            submitBtn.dataset.lon = longitude;
-            submitBtn.dataset.address = address;
+            // submitBtn.dataset.lat = latitude;
+            // submitBtn.dataset.lon = longitude;
+            // submitBtn.dataset.address = address;
+
+            location_input.dataset.lat = latitude;
+            location_input.dataset.lon = longitude;
+            location_input.dataset.address = address;
         }
     );   
 
-    submitBtn.addEventListener("click", () => {
-        if (!submitBtn.disabled) {
-            searchParking();
-        }
-    });    
+    // submitBtn.addEventListener("click", () => {
+    //     if (!submitBtn.disabled) {
+    //         searchParking();
+    //     }
+    // });    
 }
 
 
-// Handle geolocation errors
+// Manejar geolocation errors
 function showError(error) {
     switch (error.code) {
         case error.PERMISSION_DENIED:

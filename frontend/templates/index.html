@@ -12,7 +12,10 @@
         <button class="filter-button" data-bs-toggle="modal" data-bs-target="#filterModal">
             <i class="fas fa-sliders-h"></i>
         </button>
-        <input id="search" type="text" placeholder="Search Parking Location">
+        <div class="search-container">
+            <input id="search" type="text" placeholder="Where do you want to go to?">
+            <button id="voiceBtn" type="button" class="mic-button" onclick="startSpeech()"><img src="static/images/microphone.png" alt="logo" class="mic-img"></button>
+        </div>
         <ul id="suggestions"></ul>
         <div class="row g-3 justify-content-center time-div">
             <div class="col-md-6 time-input">
@@ -45,12 +48,12 @@
                     <label>
                         <input type="checkbox" id="evChargingCheckbox"
                         {% if ev_filter %}checked{% endif %}>
-                        EV-Charging vorhanden
+                        EV-charging available
                     </label>
                 </div>
 
                 <div class="modal-footer">
-                    <button class="modal-btn" onclick="applyFilter()" data-bs-dismiss="modal">Übernehmen</button>
+                    <button class="modal-btn" onclick="applyFilter()" data-bs-dismiss="modal">Submit</button>
                 </div>
             </div>
         </div>

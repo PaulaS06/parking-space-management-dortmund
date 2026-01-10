@@ -51,7 +51,6 @@ document.getElementById("search").addEventListener("input", function () {
               })
               .then(data => {
                 if (data.status === "ok") {
-                  // ✅ Button aktivieren
                   document.getElementById("submitBtn").disabled = false;
                 }
               })
