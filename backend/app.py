@@ -390,8 +390,8 @@ def nearest_parking():
 
     if distances and durations:
         for i in range(min(len(routing_targets), len(distances))):
-            routing_targets[i]["walkingDistanceInKm"] = round(distances[i] / 1000, 3)
-            routing_targets[i]["walkingTimeMinutes"] = round(durations[i] / 60, 2)
+            routing_targets[i]["walkingDistanceInKm"] = round(distances[i] / 1000, 1)
+            routing_targets[i]["walkingTimeMinutes"] = round(durations[i] / 60, 0)
     routing_targets = [
         p for p in routing_targets
         if p["walkingDistanceInKm"] is not None
@@ -557,8 +557,8 @@ def nearby_parking():
 
     if distances and durations:
         for i in range(min(len(routing_targets), len(distances))):
-            routing_targets[i]["drivingDistanceInKm"] = round(distances[i] / 1000, 3)
-            routing_targets[i]["drivingTimeMinutes"] = round(durations[i] / 60, 2)
+            routing_targets[i]["drivingDistanceInKm"] = round(distances[i] / 1000, 1)
+            routing_targets[i]["drivingTimeMinutes"] = round(durations[i] / 60, 0)
 
     routing_targets = [
         p for p in routing_targets
