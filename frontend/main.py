@@ -16,10 +16,8 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=5)
 
 # Use environment variable for backend URL, default to Docker service name
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")
-# BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
-username = os.environ.get("BACKEND_USERNAME", "admin")
-password = os.environ.get("BACKEND_PW", "admin")
-backend_client = BackendRestClient(base_url=BACKEND_URL, username=username, password=password)
+api_key = os.environ.get("API_KEY", "")
+backend_client = BackendRestClient(base_url=BACKEND_URL, api_key=api_key)
 
 # Initialize Flask-Session
 Session(app)

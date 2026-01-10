@@ -6,10 +6,10 @@ from DataTransferObjects import ParkingRequestDto, ParkingRecommendationDto
 
 class BackendRestClient:
 
-    def __init__(self, base_url: str, username: str, password: str, timeout: int = 5):
+    def __init__(self, base_url: str, api_key: str, timeout: int = 5):
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
-        self.auth = (username, password)  # Basic Auth
+        self.api_key = api_key
 
     def get_parking_recommendations(
         self,
@@ -22,7 +22,7 @@ class BackendRestClient:
             response = requests.get(
                 url,
                 params=request.to_query_params(),
-                auth=self.auth,
+                headers={"X-API-Key": self.api_key},
                 timeout=self.timeout
             )
         except requests.RequestException as e:
