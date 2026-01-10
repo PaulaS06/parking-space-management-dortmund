@@ -36,7 +36,8 @@
         <ul id="parkingList" class="result-list"></ul>
     </div>
     <!-- Bootstrap Modal -->
-    <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+     data-bs-keyboard="false">
         <div class="modal-dialog custom-modal-position">
             <div class="modal-content">
                 <div class="modal-header">
@@ -46,8 +47,7 @@
 
                 <div class="modal-body">
                     <label>
-                        <input type="checkbox" id="evChargingCheckbox"
-                        {% if ev_filter %}checked{% endif %}>
+                        <input type="checkbox" id="evChargingCheckbox">
                         EV-charging available
                     </label>
                 </div>

@@ -47,6 +47,10 @@
     <script src="/static/js/scripts.js"></script>
     <script src="/static/js/result_list.js"></script>
     <script src="/static/js/search_suggestions.js"></script>
+    <script>
+      window.evFilterState = {{ 'true' if ev_filter else 'false' }};
+    </script>
+    <script src="/static/js/filter.js"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

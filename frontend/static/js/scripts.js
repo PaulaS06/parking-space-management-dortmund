@@ -31,7 +31,7 @@
           if (data.address) {
               document.getElementById("search").value = data.address;
           }
-          if (data.lat && data.lon) {
+          if (data.lat && data.lon && data.address) {
               document.getElementById("submitBtn").disabled = false;
           } else{
               document.getElementById("submitBtn").disabled = true;
