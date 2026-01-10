@@ -45,3 +45,4 @@ frontend/__pycache__/
 *.py[cod]
 .idea
 backend/data/
+/data
