@@ -2,26 +2,22 @@ const MOCK_MODE = false; // Ready to use the backend data
 
 const MOCK_PARKINGS = [
     {
-        id: 1,
         name: "Parking Centro",
         fullAddress: "Calle 123, Ciudad",
         latitude: 4.710989,
         longitude: -74.072090,
         capacity: 12,
-        priceTotal: 5,
         pricePerHour: 1.5,
         drivingDistanceKm: 0.8,
         drivingTimeMinutes: 3,
         evCharging: true
     },
     {
-        id: 2,
         name: "Parking Norte",
         fullAddress: "Avenida 45, Ciudad",
         latitude: 4.715000,
         longitude: -74.070000,
         capacity: 3,
-        priceTotal: 7,
         pricePerHour: 2,
         drivingDistanceKm: 1.2,
         drivingTimeMinutes: 5,
@@ -76,7 +72,7 @@ function updateParkingList(list) {
                     </td>
                     <td class="table-cell-middle">
                         <p class="card-text">
-                            ${item.priceTotal}€
+                            ${item.pricePerHour}€
                         </p>
                     </td>
                     <td class="table-cell-right">
