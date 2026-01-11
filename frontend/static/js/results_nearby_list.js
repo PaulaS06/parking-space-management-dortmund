@@ -1,3 +1,36 @@
+const MOCK_MODE = false; // Ready to use the backend data
+
+const MOCK_PARKINGS = [
+    {
+        id: 1,
+        name: "Parking Centro",
+        fullAddress: "Calle 123, Ciudad",
+        latitude: 4.710989,
+        longitude: -74.072090,
+        capacity: 12,
+        priceTotal: 5,
+        pricePerHour: 1.5,
+        drivingDistanceKm: 0.8,
+        drivingTimeMinutes: 3,
+        evCharging: true
+    },
+    {
+        id: 2,
+        name: "Parking Norte",
+        fullAddress: "Avenida 45, Ciudad",
+        latitude: 4.715000,
+        longitude: -74.070000,
+        capacity: 3,
+        priceTotal: 7,
+        pricePerHour: 2,
+        drivingDistanceKm: 1.2,
+        drivingTimeMinutes: 5,
+        evCharging: false
+    }
+];
+
+
+
 function updateParkingList(list) {
     let container = document.getElementById("parkingList");
     container.innerHTML = "";
@@ -59,41 +92,47 @@ function updateParkingList(list) {
     });
 }
 
-async function searchParking() {
+
+async function searchParking({ latitude, longitude, address }) {
     clearError();
-    showLoading();
-    try{
-        const submitBtn = document.getElementById("submitBtn");
-        const latitude = parseFloat(submitBtn.dataset.lat);
-        const longitude = parseFloat(submitBtn.dataset.lon);
-        const address = submitBtn.dataset.address;
-        
-        // Mandar datos al backend
-        const response = await fetch("/api/search", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                address,
-                latitude,
-                longitude,
-            })
-        });
 
-        if (!response.ok) {
-            showError("Error fetching parking data.");
-            return;
+    try {
+        let payload;
+
+        if (MOCK_MODE) {
+            payload = MOCK_PARKINGS;
+            await new Promise(resolve => setTimeout(resolve, 500));
+        } else {
+            const response = await fetch("/api/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ latitude, longitude })
+            });
+
+            if (!response.ok) {
+                handleApiError(response.status);
+                return;
+            }
+
+            try {
+                payload = await response.json();
+            } catch {
+                showErrors("Invalid server response");
+                return;
+            }
         }
-
-        const payload = await response.json();
 
         updateParkingList(payload);
 
-    } finally {
-        hideLoading();
+    } catch (err) {
+        console.error("Network error:", err);
+        showErrors("Backend not available. Please try again later.");
+        updateParkingList([]);
     }
 }
 
-function showError(message) {
+
+function showErrors(message) {
     const box = document.getElementById("errorBox");
     box.textContent = message;
     box.classList.remove("d-none");
@@ -105,38 +144,30 @@ function clearError() {
     box.classList.add("d-none");
 }
 
-function handleApiError(status, payload) {
+function handleApiError(status) {
     switch (status) {
         case 400:
-            showError("Server error. Please try again later.");
+            showErrors("Server error. Please try again later.");
             break;
 
         case 401:
-            showError("Server error. Please try again later.");
+            showErrors("Server error. Please try again later.");
             break;
 
         case 404:
-            showError("No free parking houses found. Please try again later.");
+            showErrors("No free parking houses found. Please try again later.");
             updateParkingList([]); 
             break;
 
         case 502:
-            showError("Server not reachable. Please try again later.");
+            showErrors("Server not reachable. Please try again later.");
             break;
 
         case 500:
-            showError("Server error. Please try again later.");
+            showErrors("Server error. Please try again later.");
             break;
 
         default:
-            showError("Unknown Error. Please try again later.");
+            showErrors("Unknown Error. Please try again later.");
     }
-}
-
-function showLoading() {
-    document.getElementById("loadingOverlay").classList.remove("d-none");
-}
-
-function hideLoading() {
-    document.getElementById("loadingOverlay").classList.add("d-none");
 }

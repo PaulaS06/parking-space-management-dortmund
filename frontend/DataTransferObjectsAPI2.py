@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List
 
 @dataclass
-class ParkingRequestDto:
+class ParkingRequestDtoNearby:
     latitude: float
     longitude: float
     limit: int = 5
@@ -17,7 +17,7 @@ class ParkingRequestDto:
 
 
 @dataclass
-class ParkingRecommendationDto:
+class ParkingRecommendationDtoNearby:
     name: str
     fullAddress: str
     latitude: float
