@@ -1,0 +1,21 @@
+.nearby-container {
+    max-width: 700px;
+    margin: 50px auto 0 auto;
+    padding: 0 15px;
+}
+
+.location-display {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #333;
+}
+
+#currentLocation {
+    display: inline-block;
+    background-color: #fffdfd;
+    padding: 10px 20px;
+    border-radius: 25px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}

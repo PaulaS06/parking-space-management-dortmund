@@ -1,0 +1,48 @@
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+.venv
+venv/
+env/
+ENV/
+
+# Flask
+instance/
+.webassets-cache
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+frontend/__pycache__/
+*.py[cod]
+.idea
+backend/data/
+/data

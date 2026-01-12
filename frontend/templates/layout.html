@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/index.css">
+    {% block extra_css %}{% endblock %}
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="pb-5"> <!-- padding-bottom, damit die Navbar unten nicht überlappt -->
+
+    <!-- Hauptinhalt -->
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <nav class="fixed-bottom d-flex justify-content-center mb-3">
+    <div class="navbar navbar-dark bg-dark shadow rounded-pill px-4 py-2" style="max-width: 400px;">
+        <div class="d-flex justify-content-between" style="width: 150px;">
+
+            <a class="nav-link text-white text-center d-flex flex-column align-items-center"
+               href="{{ url_for('home') }}">
+                <i class="bi bi-search fs-5"></i>
+                <span class="small">Search</span>
+            </a>
+
+            <a class="nav-link text-white text-center d-flex flex-column align-items-center"
+               href="{{ url_for('nearby') }}">
+                <i class="bi bi-geo-alt fs-5"></i>
+                <span class="small">Nearby</span>
+            </a>
+
+        </div>
+    </div>
+</nav>
+
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/scripts.js"></script>
+    <script src="/static/js/result_list.js"></script>
+    <script src="/static/js/search_suggestions.js"></script>
+    <script>
+      window.evFilterState = {{ 'true' if ev_filter else 'false' }};
+    </script>
+    <script src="/static/js/filter.js"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
