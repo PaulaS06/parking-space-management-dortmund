@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 
 {% block extra_js %}
-<script src="static/js/location.js" defer></script>
-<script src="static/js/nearby_suggestions.js" defer></script>
+<script src="/static/js/results_nearby_list.js" defer></script>
+<script src="/static/js/nearby_location.js" defer></script>
 {% endblock %}
 
 {% block extra_css %}
@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+    <div id="errorBox" class="alert alert-danger d-none"></div>
     <div class="header">
         <img src="static/images/logo.png" alt="logo" class="header-img">
         <h1>ParkEasy</h1>
@@ -18,18 +19,9 @@
         </div>        
     </div>
 
-    <div class="location">
-        <input type="text" id="location_input" class="form-control" placeholder="My location" autocomplete="off">
         
-        <ul id="locationDropdown" class="location-dropdown d-none">
-            <li id="getLocationOption">
-                <i class="bi bi-geo-alt"></i> Get current location
-            </li>
-        </ul>
-    </div>
-
-    <div class="row g-3 justify-content-center time-div">
-        <button id="submitBtn" type="submit" class="submit-btn" onclick="searchParking()" disabled>Look Around</button>
+    <div class="location-display">
+        <span id="currentLocation">Detecting location...</span>
     </div>
 
     <ul id="parkingList" class="result-list"></ul>

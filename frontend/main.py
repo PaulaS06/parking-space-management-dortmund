@@ -75,6 +75,10 @@ def get_address():
 def details():
     return render_template('details.html')
 
+@app.route("/nearby_details")
+def nearby_details():
+    return render_template('nearby_details.html')
+
 @app.route("/api/search")
 def api_search():
     if "lat" not in session or "lon" not in session:
