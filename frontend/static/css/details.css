@@ -1,0 +1,119 @@
+.parking-detail-container {
+    text-align: left;
+}
+
+.container {
+    background-color: #f3f3f3;
+    padding-top: 20px;
+    padding-left: 5px;
+    padding-right:5px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Desktop: Container begrenzen und zentrieren */
+@media (min-width: 768px) {
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        width: 600px;     /* Desktopbreite */
+        height: 90vh;     /* Höhe automatisch */
+    }
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 16px;
+}
+
+h1 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.status-box {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+.dot {
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.dot-green {
+    background-color: #4CAF50;
+}
+
+.dot-red {
+    background-color: #e53935;
+}
+
+.info-card {
+    border-radius: 10px;
+    border: none;
+    background-color: #ffffff;
+}
+
+.info-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px 0;
+    font-size: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row .label {
+    flex: 0 0 120px;          /* feste Breite */
+    padding-right: 10px;
+    margin-right: 10px;
+    font-weight: 500;
+    color: #555;
+    border-right: 1px solid #ddd;
+}
+
+.info-row span:not(.label) {
+    flex: 1;
+    word-break: break-word;  /* sehr wichtig für lange Adressen */
+    line-height: 1.4;
+}
+
+.label {
+    font-weight: 500;
+    color: #555;
+}
+
+.maps-btn {
+    width:150px;
+    padding: 10px 20px;
+    background-color: #e4c810;
+    color: white;
+    border-radius: 5px;
+    font-size: 18px;
+    margin-right:10px;
+    margin-left:10px;
+    border:none;
+}
+
+.submit-btn:active {
+  background-color: #b9a30d;
+}

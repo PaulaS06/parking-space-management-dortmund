@@ -1,0 +1,72 @@
+{
+    "start_time": "2025-12-17T18:30:00.000Z",
+    "end_time": "2025-12-17T23:30:00.000Z",
+    "ids": [
+        "107394",
+        "101052",
+        "101057",
+        "101099",
+        "553203",
+        "553286",
+        "49249524",
+        "101065",
+        "101092",
+        "103824"
+    ],
+    "results": [
+        {
+            "id": "107394",
+            "fullAddress": "Johannesstraße 9-17, 44137 Dortmund, Germany",
+            "evCharging": true,
+            "priceTotal": 50
+        },
+        {
+            "id": "101052",
+            "fullAddress": "Südwall 4, 44122 Dortmund, Germany",
+            "evCharging": true,
+            "priceTotal": 50
+        },
+        {
+            "id": "101057",
+            "fullAddress": "Hansaplatz 1, 44137 Dortmund, Germany",
+            "evCharging": false,
+            "priceTotal": 50
+        },
+        {
+            "id": "101099",
+            "error": "Parking not found"
+        },
+        {
+            "id": "553203",
+            "fullAddress": "Innsbruckstraße 7, 44339 Dortmund, Germany",
+            "evCharging": true,
+            "priceTotal": 50
+        },
+        {
+            "id": "553286",
+            "fullAddress": "Auf dem Steine 33, 44143 Dortmund, Germany",
+            "evCharging": false,
+            "priceTotal": 50
+        },
+        {
+            "id": "49249524",
+            "error": "Parking not found"
+        },
+        {
+            "id": "101065",
+            "fullAddress": "Hohe Luft 6, 44135 Dortmund, Germany",
+            "evCharging": true,
+            "priceTotal": 50
+        },
+        {
+            "id": "101092",
+            "error": "Parking not found"
+        },
+        {
+            "id": "103824",
+            "fullAddress": "Kuckelke 3, 44135 Dortmund, Germany",
+            "evCharging": false,
+            "priceTotal": 50
+        }
+    ]
+}

@@ -1,0 +1,38 @@
+services:
+  # 1. Database Microservice
+  database:
+    build: ./database
+    ports:
+      - "5001:5001"
+    volumes:
+      - database_data:/app/database
+    environment:
+      DEBUG: "false"
+
+  # 2. The Backend (API)
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+    environment:
+      DATABASE_SERVICE_URL: http://database:5001
+      # DEBUG: "true"  # Uncomment to enable debug mode (NOT recommended for production)
+
+  # 3. The Frontend (UI)
+  frontend:
+      build: ./frontend
+      ports:
+        - "3000:3000"
+      depends_on:
+        - backend
+      environment:
+        - BACKEND_URL=http://backend:8000
+        - GEOAPIFY_API_KEY=e2a0ea3f5d5e4efd819ad7345c90e18b
+        - BACKEND_USRNAME=frontend
+        - BACKEND_PW=3mG-SrPPSK
+
+volumes:
+  db_data:
+  database_data:

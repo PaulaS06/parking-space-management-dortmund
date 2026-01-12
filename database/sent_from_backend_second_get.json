@@ -1,0 +1,112 @@
+{
+    "ids": [
+        "101088",
+        "101067",
+        "553203",
+        "553286",
+        "49249524",
+        "101073",
+        "101052",
+        "101075",
+        "101090",
+        "101054",
+        "107380",
+        "107394",
+        "101065",
+        "101070",
+        "101092",
+        "103824",
+        "101057",
+        "101099"
+    ],
+    "results": [
+        {
+            "id": "101088",
+            "error": "Parking not found"
+        },
+        {
+            "id": "101067",
+            "fullAddress": "Burgwall 4, 44135 Dortmund, Germany",
+            "evCharging": true,
+            "pricePerHour": 3
+        },
+        {
+            "id": "553203",
+            "fullAddress": "Innsbruckstraße 7, 44339 Dortmund, Germany",
+            "evCharging": true,
+            "pricePerHour": 3
+        },
+        {
+            "id": "553286",
+            "fullAddress": "Auf dem Steine 33, 44143 Dortmund, Germany",
+            "evCharging": true,
+            "pricePerHour": 3
+        },
+        {
+            "id": "49249524",
+            "error": "Parking not found"
+        },
+        {
+            "id": "101073",
+            "error": "Parking not found"
+        },
+        {
+            "id": "101052",
+            "fullAddress": "Südwall 4, 44122 Dortmund, Germany",
+            "evCharging": true,
+            "pricePerHour": 3
+        },
+        {
+            "id": "101075",
+            "error": "Parking not found"
+        },
+        {
+            "id": "101090",
+            "error": "Parking not found"
+        },
+        {
+            "id": "101054",
+            "error": "Parking not found"
+        },
+        {
+            "id": "107380",
+            "error": "Parking not found"
+        },
+        {
+            "id": "107394",
+            "fullAddress": "Johannesstraße 9-17, 44137 Dortmund, Germany",
+            "evCharging": true,
+            "pricePerHour": 3
+        },
+        {
+            "id": "101065",
+            "fullAddress": "Hohe Luft 6, 44135 Dortmund, Germany",
+            "evCharging": true,
+            "pricePerHour": 3
+        },
+        {
+            "id": "101070",
+            "error": "Parking not found"
+        },
+        {
+            "id": "101092",
+            "error": "Parking not found"
+        },
+        {
+            "id": "103824",
+            "fullAddress": "Kuckelke 3, 44135 Dortmund, Germany",
+            "evCharging": true,
+            "pricePerHour": 3
+        },
+        {
+            "id": "101057",
+            "fullAddress": "Hansaplatz 1, 44137 Dortmund, Germany",
+            "evCharging": true,
+            "pricePerHour": 3
+        },
+        {
+            "id": "101099",
+            "error": "Parking not found"
+        }
+    ]
+}
