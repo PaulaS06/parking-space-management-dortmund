@@ -65,6 +65,37 @@ def get_parking_info_bulk_get():
     return jsonify(results)
 
 
+
+# --- NEW GET endpoint for second endpoint ---
+@app.route("/api/v1/database/pricing-hour", methods=["GET"])
+def get_parking_info_bulk_second():
+    ids_str = request.args.get("ids")
+    if not ids_str:
+        return {"error": "ids parameter is required"}, 400
+
+    ids_list = [i.strip() for i in ids_str.split(",")]
+    results = []
+
+    for parking_id in ids_list:
+        parking = next((p for p in PARKINGS if p["id"] == parking_id), None)
+        if not parking:
+            results.append({"id": parking_id, "error": "Parking not found"})
+            continue
+
+        results.append({
+            "id": parking_id,
+            "fullAddress": parking["full_address"],
+            "evCharging": True,  # or random.choice([True, False])
+            "pricePerHour": 3
+        })
+
+    # Save for debugging
+    save_json({"ids": ids_list, "results": results}, "sent_from_backend_second_get.json")
+
+    return jsonify(results)
+
+
+
 if __name__ == "__main__":
     debug_mode = os.environ.get("DEBUG", "False").lower() == "true"
     app.run(host="0.0.0.0", port=5001, debug=debug_mode)
