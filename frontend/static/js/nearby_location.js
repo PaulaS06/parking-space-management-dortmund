@@ -31,9 +31,8 @@ function getCurrentLocation(element) {
             element.dataset.address = address;
 
             searchParking({
-                latitude,
-                longitude,
-                address
+                lat: latitude,
+                lon: longitude,
             });
         },
         (error) => {

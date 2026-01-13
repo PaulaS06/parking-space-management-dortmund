@@ -34,7 +34,7 @@ function updateParkingList(list) {
     if (!list || list.length === 0) {
         container.innerHTML = `
             <div class="text-muted text-center mt-3">
-                Keine Parkplätze verfügbar.
+                No parking spaces available.
             </div>`;
         return;
     }
@@ -89,44 +89,54 @@ function updateParkingList(list) {
 }
 
 
-async function searchParking({ latitude, longitude, address }) {
+const API_BASE = "http://127.0.0.1:8000";
+
+async function searchParking({ lat, lon }) {
     clearError();
 
     try {
         let payload;
 
         if (MOCK_MODE) {
-            payload = MOCK_PARKINGS;
-            await new Promise(resolve => setTimeout(resolve, 500));
+        payload = MOCK_PARKINGS;
+        await new Promise(resolve => setTimeout(resolve, 500));
         } else {
-            const response = await fetch("/api/search", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ latitude, longitude })
-            });
+        const params = new URLSearchParams({
+            lat: lat,
+            lon: lon,
+            Ev_charging: "false",
+            limit: "5"
+        });
 
-            if (!response.ok) {
-                handleApiError(response.status);
-                return;
-            }
+        const url = `${API_BASE}/api/v1/parkinghouses/nearby?${params.toString()}`;
+        console.log("Request URL:", url);
 
-            try {
-                payload = await response.json();
-            } catch {
-                showErrors("Invalid server response");
-                return;
-            }
+        const response = await fetch(url, { method: "GET" });
+
+        let data;
+        try {
+            data = await response.json();
+        } catch {
+            showErrors("Invalid server response");
+            return;
         }
 
-        updateParkingList(payload);
+        if (!response.ok) {
+            handleApiError(response.status, payload);
+            return;
+        }
+
+        payload = data;
+    }
+
+    updateParkingList(payload);
 
     } catch (err) {
         console.error("Network error:", err);
-        showErrors("Backend not available. Please try again later.");
+        showErrors("Backend not available.");
         updateParkingList([]);
     }
-}
-
+    }
 
 function showErrors(message) {
     const box = document.getElementById("errorBox");
