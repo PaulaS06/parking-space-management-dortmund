@@ -1,5 +1,9 @@
 # standardized Python DBI API used to integrate the SQLite database
 import sqlite3
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+conn = sqlite3.connect(os.path.join(BASE_DIR, "parking_space_management.db"))
 
 # pass/create a db
 #conn = sqlite3.connect(':memory:') # for a temporary db
@@ -13,7 +17,7 @@ c.execute("DROP TABLE IF EXISTS prices")
 
 # Create a table
 c.execute("""CREATE TABLE prices(
-          id INTEGER PRIMARY KEY,
+          id TEXT PRIMARY KEY,
           address TEXT,
           ev_charging INTEGER,
           hourly_pricing REAL,

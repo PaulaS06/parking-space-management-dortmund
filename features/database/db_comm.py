@@ -3,143 +3,190 @@ import sqlite3
 import json
 from datetime import datetime
 import math
+from typing import List, Dict, Any, Optional, Tuple
+import os
+
 
 app = Flask(__name__)
 
-@app.route("/api/v1/database/pricing-total", methods=["GET"])
-def get_parking_info_bulk_get():
-    start_time = request.args.get("start_time")
-    end_time = request.args.get("end_time")
-    ids_str = request.args.get("ids")
 
-    # 1. Validate input
-    if not start_time or not end_time or not ids_str:
-        return {"error": "start_time, end_time and ids are required"}, 400
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "parking_space_management")
 
-    try:
-        ids = [int(i.strip()) for i in ids_str.split(",") if i.strip()]
-    except ValueError:
-        return {"error": "ids must be comma-separated integers"}, 400
+#debug
+#print("CWD:", os.getcwd())
+#print("DB_PATH:", os.path.abspath(DB_PATH))
+#print("DB exists:", os.path.exists(DB_PATH), "size:", os.path.getsize(DB_PATH) if os.path.exists(DB_PATH) else None)
+#print("DB_PATH:", DB_PATH)
+#print("DB exists:", os.path.exists(DB_PATH), "size:", os.path.getsize(DB_PATH))
 
-    # 2. Parse datetime and calculate duration
-    try:
-        start_dt = datetime.fromisoformat(start_time)
-        end_dt = datetime.fromisoformat(end_time)
-    except ValueError:
-        return {"error": "Invalid datetime format. Use ISO-8601."}, 400
 
-    if end_dt <= start_dt:
-        return {"error": "end_time must be after start_time"}, 400
+PRICE_COLUMNS = {
+    1: "price_1h",
+    2: "price_2h",
+    3: "price_3h",
+    4: "price_4h",
+    5: "price_5h",
+    6: "price_6h",
+    7: "price_7h",
+}
+DEFAULT_TOTAL_COLUMN = "max_daily_price"
 
-    duration_hours = math.ceil((end_dt - start_dt).total_seconds() / 3600)
 
-    # 3. Select correct pricing column
-    PRICE_COLUMNS = {
-        1: "price_1h",
-        2: "price_2h",
-        3: "price_3h",
-        4: "price_4h",
-        5: "price_5h",
-        6: "price_6h",
-        7: "price_7h",
-    }
-
-    price_column = PRICE_COLUMNS.get(duration_hours, "max_daily_price")
-
-    # 4. Database query
-    conn = sqlite3.connect("parking_space_management.db")
-    c = conn.cursor()
-
-    placeholders = ",".join(["?"] * len(ids))
-
-    query = f"""
-        SELECT
-            id,
-            address,
-            ev_charging,
-            {price_column}
-        FROM prices
-        WHERE id IN ({placeholders})
-    """
-
-    c.execute(query, ids)
-    items = c.fetchall()
-    conn.close()
-
-    # 5. Pack response data
-    data = [
-        {
-            "id": str(item[0]),
-            "fullAddress": item[1],
-            "evCharging": bool(item[2]),
-            "priceTotal": item[3]
-        }
-        for item in items
-    ]
-
-    # 6. Save JSON (unchanged behavior)
-    with open("prices.json", "w", encoding="utf-8") as json_file:
-        json.dump(data, json_file, indent=4, ensure_ascii=False)
-
-    return jsonify(data), 200
-
-# --- NEW GET endpoint for second endpoint ---
-@app.route("/api/v1/database/pricing-hour", methods=["GET"])
-def get_parking_info_bulk_second():
-    ids_str = request.args.get("ids")
+# ----------------------------
+# Shared helpers
+# ----------------------------
+def parse_ids_arg(ids_str: Optional[str]) -> Tuple[Optional[List[int]], Optional[Tuple[Dict[str, str], int]]]:
+    """Parse 'ids' query param as comma-separated integers."""
     if not ids_str:
-        return {"error": "ids parameter is required"}, 400
+        return None, ({"error": "ids parameter is required"}, 400)
 
-    # Keep same parsing style, but validate as ints for DB querying
     try:
         ids_list = [int(i.strip()) for i in ids_str.split(",") if i.strip()]
     except ValueError:
-        return {"error": "ids must be comma-separated integers"}, 400
+        return None, ({"error": "ids must be comma-separated integers"}, 400)
 
     if not ids_list:
-        return {"error": "ids parameter is required"}, 400
+        return None, ({"error": "ids parameter is required"}, 400)
 
-    # Query DB for all ids at once
-    conn = sqlite3.connect("parking_space_management.db")
-    c = conn.cursor()
+    return ids_list, None
 
-    placeholders = ",".join(["?"] * len(ids_list))
+
+def parse_iso_datetime(value: Optional[str], field_name: str) -> Tuple[Optional[datetime], Optional[Tuple[Dict[str, str], int]]]:
+    if not value:
+        return None, ({ "error": f"{field_name} is required" }, 400)
+    try:
+        return datetime.fromisoformat(value), None
+    except ValueError:
+        return None, ({"error": "Invalid datetime format. Use ISO-8601."}, 400)
+
+
+def choose_total_price_column(start_dt: datetime, end_dt: datetime) -> Tuple[Optional[str], Optional[Tuple[Dict[str, str], int]]]:
+    if end_dt <= start_dt:
+        return None, ({"error": "end_time must be after start_time"}, 400)
+
+    duration_hours = math.ceil((end_dt - start_dt).total_seconds() / 3600)
+    return PRICE_COLUMNS.get(duration_hours, DEFAULT_TOTAL_COLUMN), None
+
+
+def fetch_prices_by_ids(ids: List[int], price_column: str) -> Dict[int, Dict[str, Any]]:
+    """
+    Returns a dict keyed by id with common fields + the selected price column as 'price_value'.
+    """
+    placeholders = ",".join(["?"] * len(ids))
     query = f"""
         SELECT
             id,
             address,
             ev_charging,
-            hourly_pricing
+            {price_column} AS price_value
         FROM prices
         WHERE id IN ({placeholders})
     """
 
-    c.execute(query, ids_list)
-    rows = c.fetchall()
-    conn.close()
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute(query, ids)
+        rows = c.fetchall()
 
-    # Build a lookup so we can return "Parking not found" for missing ids
-    row_by_id = {
+    # Map to a stable internal shape; endpoints can rename price_value as needed.
+    return {
         int(r[0]): {
             "id": str(r[0]),
             "fullAddress": r[1],
             "evCharging": bool(r[2]),
-            "pricePerHour": r[3]
+            "price_value": r[3],
         }
         for r in rows
     }
 
-    results = []
-    for parking_id in ids_list:
-        if parking_id not in row_by_id:
-            results.append({"id": str(parking_id), "error": "Parking not found"})
-            continue
-        results.append(row_by_id[parking_id])
 
-    # Save for debugging (keeps your shape, ids as strings like before)
+def save_json(payload: Any, path: str) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=4, ensure_ascii=False)
+
+
+# ----------------------------
+# Endpoint 1: pricing-total
+# ----------------------------
+@app.route("/api/v1/database/pricing-total", methods=["GET"])
+def get_pricing_total():
+    start_time = request.args.get("start_time")
+    end_time = request.args.get("end_time")
+    ids_str = request.args.get("ids")
+
+    ids, err = parse_ids_arg(ids_str)
+    if err:
+        return err
+
+    start_dt, err = parse_iso_datetime(start_time, "start_time")
+    if err:
+        return err
+    end_dt, err = parse_iso_datetime(end_time, "end_time")
+    if err:
+        return err
+
+    price_column, err = choose_total_price_column(start_dt, end_dt)
+    if err:
+        return err
+
+    rows_by_id = fetch_prices_by_ids(ids, price_column)
+
+    # You previously returned only found items (no "not found" placeholders) — keep that behavior.
+    data = []
+    for _id in ids:
+        row = rows_by_id.get(_id)
+        if not row:
+            continue
+        data.append({
+            "id": row["id"],
+            "fullAddress": row["fullAddress"],
+            "evCharging": row["evCharging"],
+            "priceTotal": row["price_value"],
+        })
+
+    # Keep your "write file" behavior
+    save_json(data, "prices.json")
+
+    return jsonify(data), 200
+
+
+# ----------------------------
+# Endpoint 2: pricing-hour
+# ----------------------------
+@app.route("/api/v1/database/pricing-hour", methods=["GET"])
+def get_pricing_hour():
+    ids_str = request.args.get("ids")
+
+    ids, err = parse_ids_arg(ids_str)
+    if err:
+        return err
+
+    rows_by_id = fetch_prices_by_ids(ids, "hourly_pricing")
+
+    # You want explicit "Parking not found" entries for missing IDs — keep that behavior.
+    results = []
+    for _id in ids:
+        row = rows_by_id.get(_id)
+        if not row:
+            results.append({"id": str(_id), "error": "Parking not found"})
+            continue
+
+        results.append({
+            "id": row["id"],
+            "fullAddress": row["fullAddress"],
+            "evCharging": row["evCharging"],
+            "pricePerHour": row["price_value"],
+        })
+
+    # Keep your debug file behavior
     save_json(
-        {"ids": [str(i) for i in ids_list], "results": results},
-        "sent_from_backend_second_get.json"
+        {"ids": [str(i) for i in ids], "results": results},
+        "sent_from_backend_second_get.json",
     )
 
-    return jsonify(results)
+    return jsonify(results), 200
+
+if __name__ == "__main__":
+    debug_mode = os.environ.get("DEBUG", "False").lower() == "true"
+    app.run(host="0.0.0.0", port=3000, debug=debug_mode)
