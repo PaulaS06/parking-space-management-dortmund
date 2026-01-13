@@ -134,7 +134,6 @@ async function searchParking({ lat, lon }) {
     } catch (err) {
         console.error("Network error:", err);
         showErrors("Backend not available.");
-        updateParkingList([]);
     }
     }
 
