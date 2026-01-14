@@ -52,7 +52,7 @@ class BackendRestClient:
         request: ParkingRequestDtoNearby
     ) -> List[ParkingRecommendationDtoNearby]:
 
-        url = f"{self.base_url}/api/v1/parking/do/nearby"
+        url = f"{self.base_url}/api/v1/parkinghouses/nearby"
 
         try:
             response = requests.get(

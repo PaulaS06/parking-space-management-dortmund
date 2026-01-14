@@ -4,7 +4,9 @@ import math
 import json
 import os
 import traceback
-from datetime import datetime, time
+import time as time_module  
+from datetime import datetime, time, timedelta
+
 from collections import OrderedDict
 app = Flask(__name__)
 
@@ -38,7 +40,7 @@ UPDATE_INTERVAL = 120  # segundos
 def get_parking_data():
     filename = "dortmund_parkings_processed.json"
     filepath = os.path.join(DATA_DIR, filename)
-    now = time.time()
+    now = time_module.time()
 
     # If file dioes not exist, fetch data
     if not os.path.exists(filepath):
@@ -253,61 +255,95 @@ def geoapify_routing_matrix(user_lat, user_lon, parkings, mode="walk"):
 # -----------------------------------------
 # Funtion that verifies availability
 # -----------------------------------------
-def parking_is_available(parking, start_dt, end_dt):
-    # Day of the week: Monday=0 ... Sunday=6
-    weekday = start_dt.weekday()
 
-    # Select field based on the day
+
+def parking_is_available(parking, start_dt, end_dt):
+    # 1. Basic validations
+    if not parking or not start_dt or not end_dt:
+        return False
+
+    # If end data is earlier or equal to the start date, it's an error
+    if start_dt >= end_dt:
+        return False 
+    current_check = start_dt
+
+    # Map to know what fields to read based on the day of the week (0=Monday, 6=Sunday)
     day_map = {
-        0: ("mostart", "moende", "sastart", "saende"),  # Monday
-        1: ("distart", "diende", "sastart", "saende"),  # Tuesday
-        2: ("mistart", "miende", "sastart", "saende"),  # Wednesday
-        3: ("dostart", "doende", "sastart", "saende"),  # Thursday
-        4: ("frstart", "frende", "sastart", "saende"),  # Friday
-        5: ("sastart", "saende", "sastart", "saende"),  # Saturday
-        6: ("sostart", "soende", "sastart", "saende"),  # Sunday 
+        0: ("mostart", "moende"), 
+        1: ("distart", "diende"),
+        2: ("mistart", "miende"), 
+        3: ("dostart", "doende"),
+        4: ("frstart", "frende"), 
+        5: ("sastart", "saende"),
+        6: ("sostart", "soende"),
     }
 
-    start_field, end_field, sat_start_field, sat_end_field = day_map[weekday]
-    start_str = parking.get(start_field)
-    end_str = parking.get(end_field)
+    # Límite de seguridad para evitar bucles infinitos
+    safety_loops = 0
 
-    # ----- Special cases -----
+    # 2. Loop: While we haven't covered all the requested time...
+    while current_check < end_dt and safety_loops < 30:
+        safety_loops += 1
+        
+        # Calculate when "this day" ends (the next midnight)
+        # This is used to split the validation into daily segments
+        # We use datetime.min.time() which gives us 00:00:00 without conflicts
+        next_midnight = datetime.combine(current_check.date() + timedelta(days=1), datetime.min.time())
+        
+        # The limit of validation is: either the end of the reservation, or midnight (whichever comes first)
+        limit_for_this_segment = min(end_dt, next_midnight)
+        
+        # Get the opening and closing times for the day we are checking
+        weekday = current_check.weekday()
+        start_key, end_key = day_map[weekday]
+        
+        s_str = parking.get(start_key)
+        e_str = parking.get(end_key)
+        
+        # Special logic for Sunday: If empty, use Saturday's schedule
+        if weekday == 6:
+            if s_str in [None, "-"]: return False
+            if e_str is None: e_str = parking.get("saende")
 
-    # "-" means closed day
-    if start_str == "-" or end_str == "-":
-        return False
+        # If no schedule, it's closed
+        if s_str in [None, "-"] or e_str in [None, "-"]:
+            return False 
 
-    # If sunday: soende = null → use saende
-    if weekday == 6:
-        if start_str in [None, "-"]:
-            return False  # sunday does not open
-        if end_str is None:
-            # Use saende
-            end_str = parking.get(sat_end_field)
+        try:
+            # Parse the hours from the JSON
+            open_t = datetime.strptime(s_str, "%H:%M").time()
+            close_t = datetime.strptime(e_str, "%H:%M").time()
+            
+            # Convert to datetime complete for comparison
+            day_open_dt = datetime.combine(current_check.date(), open_t)
+            
+            # Key correction for closing time at 23:59
+            # If the parking closes at 23:59, mathematically convert it 
+            # to 00:00 of the next day so there's no 1-minute gap.
+            if close_t.hour == 23 and close_t.minute == 59:
+                day_close_dt = datetime.combine(current_check.date() + timedelta(days=1), datetime.min.time())
+            else:
+                day_close_dt = datetime.combine(current_check.date(), close_t)
+                
+        except ValueError:
+            # If the time format is invalid, assume closed
+            return False
 
-    # If any field is None → closed
-    if start_str is None or end_str is None:
-        return False
+        # 3. Comparisons
+        # A) The user wants to enter before it opens?
+        if current_check < day_open_dt:
+            return False
+            
+        # B) The user wants to stay after it closes?
+        # Compare the end of this segment with the closing time
+        if limit_for_this_segment > day_close_dt:
+            return False
 
-    # -----------------------------------------
-    # Convert "HH:MM" to datetime
-    # -----------------------------------------
-    try:
-        open_t = datetime.strptime(start_str, "%H:%M").time()
-        close_t = datetime.strptime(end_str, "%H:%M").time()
-    except:
-        return False
+        # If it passes all validations, advance the check time to the end of this segment
+        current_check = limit_for_this_segment
 
-    parking_open_dt = datetime.combine(start_dt.date(), open_t)
-    parking_close_dt = datetime.combine(start_dt.date(), close_t)
-
-    # -----------------------------------------
-    # Verify if user frame time is within
-    # -----------------------------------------
-    return parking_open_dt <= start_dt and end_dt <= parking_close_dt
-
-
+    # If the loop ends successfully, it means it covered the entire range
+    return True
 # ---------------------------------------------------------
 # EndPoint 
 # ---------------------------------------------------------

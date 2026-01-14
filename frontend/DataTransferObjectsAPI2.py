@@ -4,14 +4,16 @@ from typing import List
 
 @dataclass
 class ParkingRequestDtoNearby:
-    latitude: float
-    longitude: float
+    lat: float
+    lon: float
+    ev_charging: str = "false"
     limit: int = 5
 
     def to_query_params(self) -> dict:
         return {
-            "lat": self.latitude,
-            "lng": self.longitude,
+            "lat": self.lat,
+            "lon": self.lon,
+            "Ev_charging": self.ev_charging,
             "limit": self.limit
         }
 
@@ -23,7 +25,7 @@ class ParkingRecommendationDtoNearby:
     latitude: float
     longitude: float
     capacity: int
-    pricePerHour: float
     evCharging: bool
-    drivingTimeMinutes: int
+    pricePerHour: float
+    drivingTimeMinutes: float
     drivingDistanceInKm: float
