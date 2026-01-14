@@ -58,7 +58,7 @@ class BackendRestClient:
             response = requests.get(
                 url,
                 params=request.to_query_params(),
-                auth=self.auth,
+                headers={"X-API-Key": self.api_key},
                 timeout=self.timeout
             )
         except requests.RequestException as e:
@@ -77,6 +77,6 @@ class BackendRestClient:
             raise BackendServerError("Backend internal server error")
 
         return [
-            ParkingRecommendationDto(**item)
+            ParkingRecommendationDtoNearby(**item)
             for item in response.json()
         ]

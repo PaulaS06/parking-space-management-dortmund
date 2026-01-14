@@ -89,7 +89,6 @@ function updateParkingList(list) {
 }
 
 
-const API_BASE = "http://127.0.0.1:8000";
 
 async function searchParking({ lat, lon }) {
     clearError();
@@ -98,17 +97,16 @@ async function searchParking({ lat, lon }) {
         let payload;
 
         if (MOCK_MODE) {
-        payload = MOCK_PARKINGS;
-        await new Promise(resolve => setTimeout(resolve, 500));
+            payload = MOCK_PARKINGS;
+            await new Promise(resolve => setTimeout(resolve, 500));
         } else {
-        const params = new URLSearchParams({
-            lat: lat,
-            lon: lon,
-            Ev_charging: "false",
-            limit: "5"
-        });
+            const params = new URLSearchParams({
+                lat: lat,
+                lon: lon,
+                // Ev_charging and limit are handled in python proxy by defaults or can be passed if needed
+            });
 
-        const url = `${API_BASE}/api/v1/parkinghouses/nearby?${params.toString()}`;
+        const url = `/api/nearby?${params.toString()}`;
         console.log("Request URL:", url);
 
         const response = await fetch(url, { method: "GET" });
