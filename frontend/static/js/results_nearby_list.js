@@ -89,7 +89,7 @@ function updateParkingList(list) {
 }
 
 
-const API_BASE = "http://127.0.0.1:8000";
+const BACKEND_URL = "http://127.0.0.1:8000";
 
 async function searchParking({ lat, lon }) {
     clearError();
@@ -108,8 +108,7 @@ async function searchParking({ lat, lon }) {
             limit: "5"
         });
 
-        const url = `${API_BASE}/api/v1/parkinghouses/nearby?${params.toString()}`;
-        console.log("Request URL:", url);
+        const url = `${BACKEND_URL}/api/v1/parkinghouses/nearby?${params.toString()}`;
 
         const response = await fetch(url, { method: "GET" });
 
