@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
+import logging
 import math
 import json
 import os
@@ -9,13 +10,19 @@ from datetime import datetime, time, timedelta
 
 from collections import OrderedDict
 app = Flask(__name__)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+)
 
 # -------------------------------
 # URLs and API Keys
 # -------------------------------
 DORTMUND_URL = "https://open-data.dortmund.de/api/explore/v2.1/catalog/datasets/parkhauser/records"
-GEOAPIFY_ROUTING_KEY = "9a49c37eba2c4a87ac26e3610becac2b"
+GEOAPIFY_ROUTING_KEY = os.environ.get("GEOAPIFY_API_KEY", "9a49c37eba2c4a87ac26e3610becac2b")
 DATABASE_SERVICE_URL = os.environ.get("DATABASE_SERVICE_URL", "http://localhost:5001")
+BASIC_AUTH_USERNAME = os.environ.get("BASIC_AUTH_USERNAME", "admin")
+BASIC_AUTH_PASSWORD = os.environ.get("BASIC_AUTH_PASSWORD", "lYbqZkYhlC2IJin7HcX5")
 
 #-------------------------------
 # Function to get parking data
@@ -33,14 +40,17 @@ def get_parking_data():
     # If file dioes not exist, fetch data
     if not os.path.exists(filepath):
         print("Parking file does not exist. Fetching from API...")
+        app.logger.info("Parking file does not exist. Fetching from API...")
         return fetch_and_save_parking_data()
 
     last_update = os.path.getmtime(filepath)
     if now - last_update > UPDATE_INTERVAL:
         print("Parking data is older than 2 minutes. Updating...")
+        app.logger.info("Parking data is older than 2 minutes. Updating...")
         return fetch_and_save_parking_data()
     else:
         print("Using cached parking data...")
+        app.logger.info("Using cached parking data...")
         return load_json(filename)
 
 
@@ -151,6 +161,7 @@ def fetch_and_save_parking_data():
 
     # Save raw data
     print(len(raw_records))
+    app.logger.info(f"received {len(raw_records)} from open data dortmund.")
     #save_json(raw_records, "dortmund_parkings_raw.json")
 
     # Save parking houses processed
@@ -178,10 +189,12 @@ def enrich_parking_info(parkings, start_time, end_time):
     }
 
     try:
-        resp = requests.get(url, params=params, timeout=10)
+        app.logger.info("query DB")
+        resp = requests.get(url, params=params, timeout=10, auth=(BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD))
         resp.raise_for_status()
         db_data = resp.json()
 
+        app.logger.info(f"received {len(db_data)} parkings from DB")
         db_dict = {item["id"]: item for item in db_data}
 
         for p in parkings:
@@ -227,6 +240,7 @@ def geoapify_routing_matrix(user_lat, user_lon, parkings, mode="walk"):
         results = data.get("sources_to_targets", [])
         if not results or not results[0]:
             print("Routing matrix returned no data")
+            app.logger.info("Routing matrix returned no data")
             return None, None
 
         distances = [item["distance"] for item in results[0]]
@@ -452,7 +466,7 @@ def enrich_parking_info_second_endpoint(parkings):
     params = {"ids": ids}
 
     try:
-        resp = requests.get(url, params=params, timeout=10)
+        resp = requests.get(url, params=params, timeout=10, auth=(BASIC_AUTH_USERNAME, BASIC_AUTH_PASSWORD))
         resp.raise_for_status()
         db_data = resp.json()
 
