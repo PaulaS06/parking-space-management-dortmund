@@ -16,8 +16,8 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "parking_space_management")
 
-BASIC_AUTH_USERNAME = os.environ.get("BASIC_AUTH_USERNAME")
-BASIC_AUTH_PASSWORD = os.environ.get("BASIC_AUTH_PASSWORD")
+BASIC_AUTH_USERNAME = os.environ.get("BASIC_AUTH_USERNAME", "admin")
+BASIC_AUTH_PASSWORD = os.environ.get("BASIC_AUTH_PASSWORD", "lYbqZkYhlC2IJin7HcX5")
 
 if not BASIC_AUTH_USERNAME or not BASIC_AUTH_PASSWORD:
     raise RuntimeError("BASIC_AUTH_USERNAME and BASIC_AUTH_PASSWORD must be set")
@@ -194,7 +194,7 @@ def get_pricing_total():
         })
 
     # Keep your "write file" behavior
-    save_json(data, "prices.json")
+    # save_json(data, "prices.json")
 
     return jsonify(data), 200
 
