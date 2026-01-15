@@ -24,16 +24,12 @@ function getCurrentLocation(element) {
                 console.error("Error fetching address:", error);
             }
 
-            element.textContent = address;
-
             element.dataset.lat = latitude;
             element.dataset.lon = longitude;
-            element.dataset.address = address;
 
             searchParking({
-                latitude,
-                longitude,
-                address
+                lat: latitude,
+                lon: longitude,
             });
         },
         (error) => {
