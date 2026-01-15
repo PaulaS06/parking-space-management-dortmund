@@ -5,6 +5,9 @@ from datetime import datetime
 import math
 from typing import List, Dict, Any, Optional, Tuple
 import os
+from functools import wraps
+from flask import Response
+import base64
 
 
 app = Flask(__name__)
@@ -13,12 +16,56 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "parking_space_management")
 
+BASIC_AUTH_USERNAME = os.environ.get("BASIC_AUTH_USERNAME")
+BASIC_AUTH_PASSWORD = os.environ.get("BASIC_AUTH_PASSWORD")
+
+if not BASIC_AUTH_USERNAME or not BASIC_AUTH_PASSWORD:
+    raise RuntimeError("BASIC_AUTH_USERNAME and BASIC_AUTH_PASSWORD must be set")
+
+
+def check_auth(auth_header: str) -> bool:
+    if not auth_header or not auth_header.startswith("Basic "):
+        return False
+
+    try:
+        encoded_credentials = auth_header.split(" ", 1)[1]
+        decoded = base64.b64decode(encoded_credentials).decode("utf-8")
+        username, password = decoded.split(":", 1)
+    except Exception:
+        return False
+
+    return (
+        username == BASIC_AUTH_USERNAME
+        and password == BASIC_AUTH_PASSWORD
+    )
+
+
+def require_basic_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get("Authorization")
+
+        if not check_auth(auth_header):
+            return Response(
+                "Unauthorized",
+                401,
+                {"WWW-Authenticate": 'Basic realm="Login Required"'},
+            )
+
+        return f(*args, **kwargs)
+
+    return decorated
+
+
 #debug
 #print("CWD:", os.getcwd())
 #print("DB_PATH:", os.path.abspath(DB_PATH))
 #print("DB exists:", os.path.exists(DB_PATH), "size:", os.path.getsize(DB_PATH) if os.path.exists(DB_PATH) else None)
 #print("DB_PATH:", DB_PATH)
 #print("DB exists:", os.path.exists(DB_PATH), "size:", os.path.getsize(DB_PATH))
+
+#BASIC_AUTH_USERNAME = "admin"
+#BASIC_AUTH_PASSWORD = "secret123"
 
 
 PRICE_COLUMNS = {
@@ -110,6 +157,7 @@ def save_json(payload: Any, path: str) -> None:
 # Endpoint 1: pricing-total
 # ----------------------------
 @app.route("/api/v1/database/pricing-total", methods=["GET"])
+@require_basic_auth
 def get_pricing_total():
     start_time = request.args.get("start_time")
     end_time = request.args.get("end_time")
@@ -155,6 +203,7 @@ def get_pricing_total():
 # Endpoint 2: pricing-hour
 # ----------------------------
 @app.route("/api/v1/database/pricing-hour", methods=["GET"])
+@require_basic_auth
 def get_pricing_hour():
     ids_str = request.args.get("ids")
 
@@ -189,4 +238,4 @@ def get_pricing_hour():
 
 if __name__ == "__main__":
     debug_mode = os.environ.get("DEBUG", "False").lower() == "true"
-    app.run(host="0.0.0.0", port=3000, debug=debug_mode)
+    app.run(host="0.0.0.0", port=5001, debug=debug_mode)

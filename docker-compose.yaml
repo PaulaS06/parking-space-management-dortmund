@@ -8,6 +8,8 @@ services:
       - database_data:/app/database
     environment:
       DEBUG: "false"
+      BASIC_AUTH_USERNAME: admin
+      BASIC_AUTH_PASSWORD: lYbqZkYhlC2IJin7HcX5
 
   # 2. The Backend (API)
   backend:
