@@ -23,7 +23,7 @@ logging.basicConfig(
 # Use environment variable for backend URL, default to Docker service name
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 api_key = os.environ.get("API_KEY", "secure-api-key-123")
-app.logger.info(f"api_key: {api_key}")
+
 backend_client = BackendRestClient(base_url=BACKEND_URL, api_key=api_key, timeout=8)
 
 # Initialize Flask-Session

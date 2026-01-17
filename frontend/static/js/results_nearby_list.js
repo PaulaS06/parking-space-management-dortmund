@@ -100,11 +100,12 @@ async function searchParking({ lat, lon }) {
             payload = MOCK_PARKINGS;
             await new Promise(resolve => setTimeout(resolve, 500));
         } else {
-            const params = new URLSearchParams({
-                lat: lat,
-                lon: lon,
-                // Ev_charging and limit are handled in python proxy by defaults or can be passed if needed
-            });
+        const params = new URLSearchParams({
+            lat: lat,
+            lon: lon,
+            Ev_charging: "false",
+            limit: "5"
+        });
 
         const url = `/api/nearby?${params.toString()}`;
         console.log("Request URL:", url);

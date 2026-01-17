@@ -13,19 +13,38 @@ function getCurrentLocation(element) {
         async (position) => {
             const { latitude, longitude } = position.coords;
 
-            let address = "Unknown location";
+            let addressText = "Unknown location";
             try {
                 const res = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
                 );
                 const data = await res.json();
-                address = data.display_name || address;
+
+                const address = data.address || {};
+
+                const city =
+                address.city ||
+                address.town ||
+                address.municipality ||
+                "";
+
+
+                if (city.toLowerCase() !== "dortmund") {
+                    element.textContent = "You must be located in Dortmund.";
+                    return; 
+                }
+
+                addressText = data.display_name || addressText;
+
             } catch (error) {
                 console.error("Error fetching address:", error);
             }
 
+            element.textContent = addressText;
+
             element.dataset.lat = latitude;
             element.dataset.lon = longitude;
+            element.dataset.address = addressText;
 
             searchParking({
                 lat: latitude,
