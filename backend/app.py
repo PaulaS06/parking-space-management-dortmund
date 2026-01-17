@@ -19,10 +19,24 @@ logging.basicConfig(
 # URLs and API Keys
 # -------------------------------
 DORTMUND_URL = "https://open-data.dortmund.de/api/explore/v2.1/catalog/datasets/parkhauser/records"
-GEOAPIFY_ROUTING_KEY = os.environ.get("GEOAPIFY_API_KEY", "9a49c37eba2c4a87ac26e3610becac2b")
-DATABASE_SERVICE_URL = os.environ.get("DATABASE_SERVICE_URL", "http://localhost:5001")
+
 BASIC_AUTH_USERNAME = os.environ.get("BASIC_AUTH_USERNAME", "admin")
 BASIC_AUTH_PASSWORD = os.environ.get("BASIC_AUTH_PASSWORD", "lYbqZkYhlC2IJin7HcX5")
+
+GEOAPIFY_ROUTING_KEY = os.environ.get("GEOAPIFY_ROUTING_KEY", "9a49c37eba2c4a87ac26e3610becac2b")
+DATABASE_SERVICE_URL = os.environ.get("DATABASE_SERVICE_URL", "http://localhost:5001")
+API_KEY = os.environ.get("API_KEY", "secure-api-key-123")
+
+from functools import wraps
+
+def require_api_key(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if request.headers.get("X-API-Key") == API_KEY:
+            return f(*args, **kwargs)
+        else:
+            return jsonify({"error": "Unauthorized"}), 401
+    return decorated_function
 
 #-------------------------------
 # Function to get parking data
@@ -350,6 +364,7 @@ def parking_is_available(parking, start_dt, end_dt):
 # EndPoint 
 # ---------------------------------------------------------
 @app.route("/api/v1/parkinghouses/walking", methods=["GET"])
+@require_api_key
 def nearest_parking():
     #fetch_and_save_parking_data()
     user_lat = request.args.get("lat", type=float)
@@ -525,6 +540,7 @@ def geoapify_routing_matrix_second_endpoint(user_lat, user_lon, parkings, mode="
 ############################
 #define a second endpoint for Frontend
 @app.route("/api/v1/parkinghouses/nearby", methods = ['GET'])
+@require_api_key
 def nearby_parking():
     #fetch_and_save_parking_data()
     user_lat = request.args.get("lat", type=float)
