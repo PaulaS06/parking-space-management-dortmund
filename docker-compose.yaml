@@ -51,7 +51,7 @@ services:
     container_name: tunnel
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
-    command: tunnel --url http://frontend:3000
+    command: tunnel --url http://frontend:3000 --protocol http2
     networks:
       - tunneling
 
