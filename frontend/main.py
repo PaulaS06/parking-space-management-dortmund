@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, jsonify, session
 from flask_session import Session
 from DataTransferObjects import ParkingRequestDto
+from DataTransferObjectsAPI2 import ParkingRequestDtoNearby
 from BackendRestClient import BackendRestClient
+import logging
 from datetime import timedelta, datetime, date
 from Exceptions import BackendServerError, InvalidParameterError, NoResultsError, AuthFailedError
 import requests
@@ -13,13 +15,16 @@ app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False     # Sessions expire when the browser is closed
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=5)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+)
 
 # Use environment variable for backend URL, default to Docker service name
-BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend:8000")
-# BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
-username = os.environ.get("BACKEND_USERNAME", "admin")
-password = os.environ.get("BACKEND_PW", "admin")
-backend_client = BackendRestClient(base_url=BACKEND_URL, username=username, password=password)
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
+api_key = os.environ.get("API_KEY", "secure-api-key-123")
+
+backend_client = BackendRestClient(base_url=BACKEND_URL, api_key=api_key, timeout=8)
 
 # Initialize Flask-Session
 Session(app)
@@ -130,6 +135,44 @@ def api_search():
 
     except Exception as e:
         app.logger.error(f"Unexpected error in /api/search: {str(e)}", exc_info=True)
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
+@app.route("/api/nearby")
+def api_nearby():
+    lat = request.args.get("lat")
+    lon = request.args.get("lon")
+    
+    if not lat or not lon:
+         return jsonify({"error": "location not set"}), 400
+
+    request_dto = ParkingRequestDtoNearby(
+        lat=lat,
+        lon=lon,
+        ev_charging="false", # Default or get from request if needed
+        limit=5
+    )
+
+    try:
+        results = backend_client.get_nearby_parking_recommendations(request_dto)
+        return jsonify([r.__dict__ for r in results])
+
+    except InvalidParameterError as e:
+        return jsonify({"error": str(e)}), 400
+
+    except AuthFailedError as e:
+        return jsonify({"error": str(e)}), 401
+
+    except NoResultsError as e:
+        return jsonify({
+            "error": str(e),
+            "results": []
+        }), 404
+
+    except BackendServerError as e:
+        return jsonify({"error": str(e)}), 502 
+
+    except Exception as e:
+        app.logger.error(f"Unexpected error in /api/nearby: {str(e)}", exc_info=True)
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
 @app.route("/set_time", methods=["POST"])
